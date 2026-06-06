@@ -1,0 +1,5 @@
+# Code owners — otomatis di-request sebagai reviewer untuk setiap PR.
+# Hanya owner yang boleh menyetujui & merge.
+# Lihat: https://docs.github.com/articles/about-code-owners
+
+* @razornez
