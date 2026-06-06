@@ -1,0 +1,7 @@
+Website: https://desa-contoh-maju.desa.id
+Jumlah Penduduk: 3210 jiwa
+Tahun Data: 2025
+Kategori Desa: Maju
+Kecamatan: Cibungbulang
+Kabupaten: Bogor
+Provinsi: Jawa Barat

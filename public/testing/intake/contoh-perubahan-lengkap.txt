@@ -1,0 +1,21 @@
+﻿BERITA ACARA PEMBARUAN DATA DESA
+
+Nama Desa: Baros
+Tanggal Penyusunan: 6 Mei 2026
+Website: https://baros-arjasari.desa.id
+Jumlah Penduduk: 3786 jiwa
+Tahun Data: 2025
+Kategori Desa: Maju
+Kecamatan: Arjasari
+Kabupaten: Bandung
+Provinsi: Jawa Barat
+
+RINGKASAN PERUBAHAN
+- Website resmi diperbarui dari domain lama ke domain desa.id.
+- Jumlah penduduk disesuaikan berdasarkan rekap pelayanan semester II 2025.
+- Kategori desa diperbarui menjadi Maju.
+- Metadata wilayah diverifikasi ulang oleh tim administrasi desa.
+
+CATATAN REVIEW INTERNAL
+Dokumen ini dipakai sebagai contoh uji intake.
+Data ini belum boleh dipublikasikan otomatis dan tetap harus melalui review internal.

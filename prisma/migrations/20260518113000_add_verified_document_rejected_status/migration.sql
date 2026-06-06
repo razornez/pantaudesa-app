@@ -1,0 +1,1 @@
+ALTER TYPE "DocumentUploadStatus" ADD VALUE IF NOT EXISTS 'REJECTED';

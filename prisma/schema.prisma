@@ -1,0 +1,1115 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/generated/prisma"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── User ─────────────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  // NextAuth required fields — must match exact names PrismaAdapter expects
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  // PantauDesa custom fields
+  username       String?   @unique
+  nama           String?
+  bio            String?
+  avatarUrl      String?
+  role           Role      @default(WARGA)
+  // PIN auth
+  pinHash        String?
+  pinAttempts    Int       @default(0)
+  pinLockedUntil DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // NextAuth relations
+  accounts Account[]
+  sessions Session[]
+
+  // Citizen voice relations
+  voices     Voice[]
+  replies    VoiceReply[]
+  votes      VoiceVote[]
+  helpfuls   VoiceHelpful[]
+
+  // Sprint 04 foundations
+  desaAdminClaims  DesaAdminClaim[]
+  desaAdminMembers DesaAdminMember[]
+
+  // Sprint 04-008 additions
+  adminNotifications AdminDesaNotification[]
+  adminDocuments     AdminDesaDocument[]
+
+  @@map("users")
+}
+
+// ─── OTP ──────────────────────────────────────────────────────────────────────
+
+model OtpCode {
+  id        String     @id @default(cuid())
+  email     String
+  codeHash  String
+  purpose   OtpPurpose
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime   @default(now())
+
+  @@index([email, purpose])
+  @@map("otp_codes")
+}
+
+enum OtpPurpose {
+  REGISTER
+  RESET_PIN
+  UNFREEZE
+}
+
+// ─── Citizen Voice ────────────────────────────────────────────────────────────
+
+model Voice {
+  id         String        @id @default(cuid())
+  desaId     String
+  category   VoiceCategory
+  text       String        @db.Text
+  isAnon     Boolean       @default(false)
+  status     VoiceStatus   @default(OPEN)
+  photos     String[]
+  resolvedAt DateTime?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  authorId   String?
+  author     User?         @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  replies    VoiceReply[]
+  votes      VoiceVote[]
+  helpfuls   VoiceHelpful[]
+
+  @@index([desaId])
+  @@index([createdAt])
+  @@map("voices")
+}
+
+model VoiceReply {
+  id              String   @id @default(cuid())
+  voiceId         String
+  text            String   @db.Text
+  isAnon          Boolean  @default(false)
+  isOfficialDesa  Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  authorId  String?
+  author    User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  voice     Voice   @relation(fields: [voiceId], references: [id], onDelete: Cascade)
+
+  @@index([voiceId])
+  @@map("voice_replies")
+}
+
+model VoiceVote {
+  id        String    @id @default(cuid())
+  voiceId   String
+  userId    String
+  type      VoteType
+  createdAt DateTime  @default(now())
+
+  voice  Voice @relation(fields: [voiceId], references: [id], onDelete: Cascade)
+  user   User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([voiceId, userId])
+  @@map("voice_votes")
+}
+
+model VoiceHelpful {
+  id        String   @id @default(cuid())
+  voiceId   String
+  userId    String
+  createdAt DateTime @default(now())
+
+  voice  Voice @relation(fields: [voiceId], references: [id], onDelete: Cascade)
+  user   User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([voiceId, userId])
+  @@map("voice_helpfuls")
+}
+
+enum VoiceCategory {
+  infrastruktur
+  bansos
+  fasilitas
+  anggaran
+  lingkungan
+  lainnya
+}
+
+enum VoiceStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+enum VoteType {
+  BENAR
+  BOHONG
+}
+
+enum Role {
+  WARGA
+  DESA
+  ADMIN
+  INTERNAL_ADMIN
+}
+
+// ─── Sprint 03 Data Foundation ────────────────────────────────────────────────
+
+model Desa {
+  id              String                 @id @default(cuid())
+  kodeDesa        String?                @unique
+  nama            String
+  slug            String                 @unique
+  kecamatan       String
+  kabupaten       String
+  provinsi        String
+  tahunData       Int?
+  jumlahPenduduk  Int?
+  kategori        String?
+  websiteUrl      String?
+  dataStatus      DataStatus             @default(demo)
+  dataSourceLabel String?                // e.g. "Dokumen Admin Desa" or source name
+  dataPublishedAt DateTime?              // when internal admin last published data
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  dataSources       DataSource[]
+  perangkat         PerangkatDesa[]
+  desaAdminClaims   DesaAdminClaim[]
+  desaAdminMembers  DesaAdminMember[]
+  desaAdminInvites  DesaAdminInvite[]
+  anggaranSummaries AnggaranDesaSummary[]
+  apbdesItems       APBDesItem[]
+  dokumenPublik     DokumenPublik[]
+  adminDocuments    AdminDesaDocument[]
+  villageDataVersions VillageDataVersion[]
+  dataAuditEvents   DesaDataAuditEvent[]
+  dataSourceFetchRuns DataSourceFetchRun[]
+
+  detailTemplateAssignment     DesaDetailTemplateAssignment?
+  componentVisibilityOverrides DesaDetailComponentVisibility[]
+  dataDesa                     DataDesa[]
+
+  @@index([kecamatan, kabupaten, provinsi])
+  @@index([dataStatus])
+  @@map("desa")
+}
+
+model DataSource {
+  id               String           @id @default(cuid())
+  desaId           String?
+  scopeType        ScopeType
+  scopeName        String
+  sourceName       String
+  sourceUrl        String?
+  sourceType       SourceType
+  accessStatus     AccessStatus     @default(unknown)
+  dataAvailability DataAvailability @default(unknown)
+  lastCheckedAt    DateTime?
+  notes            String?          @db.Text
+  dataStatus       DataStatus       @default(needs_review)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  desa              Desa?                  @relation(fields: [desaId], references: [id], onDelete: SetNull)
+  anggaranSummaries AnggaranDesaSummary[]
+  apbdesItems       APBDesItem[]
+  dokumenPublik     DokumenPublik[]
+  perangkatDesa     PerangkatDesa[]
+  fetchRuns         DataSourceFetchRun[]
+
+  @@index([desaId])
+  @@index([scopeType, scopeName])
+  @@index([sourceType])
+  @@index([accessStatus])
+  @@index([dataStatus])
+  @@map("data_sources")
+}
+
+model DataSourceFetchRun {
+  id                String   @id @default(cuid())
+  dataSourceId      String?
+  desaId            String?
+  inputMode         String   @default("SOURCE_INGESTION")
+  sourceTypeCode    String?
+  sourceName        String?
+  sourceUrl         String
+  requestLabel      String?
+  status            String   @default("PENDING")
+  fetchedAt         DateTime?
+  completedAt       DateTime?
+  httpStatus        Int?
+  contentType       String?
+  rawText           String?  @db.Text
+  extractedMetaJson Json?
+  errorMessage      String?  @db.Text
+  createdByUserId   String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  dataSource DataSource? @relation(fields: [dataSourceId], references: [id], onDelete: SetNull)
+  desa       Desa?       @relation(fields: [desaId], references: [id], onDelete: SetNull)
+
+  @@index([dataSourceId, createdAt])
+  @@index([desaId, createdAt])
+  @@index([status, createdAt])
+  @@map("data_source_fetch_runs")
+}
+
+model AnggaranDesaSummary {
+  id                    String        @id @default(cuid())
+  desaId                String
+  tahun                 Int
+  totalAnggaran         BigInt?
+  totalRealisasi        BigInt?
+  persentaseRealisasi   Decimal?      @db.Decimal(5, 2)
+  statusSerapan         StatusSerapan @default(unknown)
+  sourceId              String?
+  dataStatus            DataStatus    @default(demo)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  desa   Desa        @relation(fields: [desaId], references: [id], onDelete: Cascade)
+  source DataSource? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+
+  @@unique([desaId, tahun])
+  @@index([tahun])
+  @@index([sourceId])
+  @@index([dataStatus])
+  @@map("anggaran_desa_summaries")
+}
+
+model APBDesItem {
+  id          String     @id @default(cuid())
+  desaId      String
+  tahun       Int
+  kodeBidang  String?
+  namaBidang  String
+  anggaran    BigInt?
+  realisasi   BigInt?
+  persentase  Decimal?   @db.Decimal(5, 2)
+  sourceId    String?
+  dataStatus  DataStatus @default(demo)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  desa   Desa        @relation(fields: [desaId], references: [id], onDelete: Cascade)
+  source DataSource? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+
+  @@index([desaId, tahun])
+  @@index([sourceId])
+  @@index([dataStatus])
+  @@map("apbdes_items")
+}
+
+model DokumenPublik {
+  id             String         @id @default(cuid())
+  desaId         String
+  tahun          Int?
+  namaDokumen    String
+  jenisDokumen   DocumentType   @default(other)
+  status         DocumentStatus @default(unknown)
+  url            String?
+  fileType       String?
+  sourceId       String?
+  publishedAt    DateTime?
+  lastCheckedAt  DateTime?
+  dataStatus     DataStatus     @default(demo)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  desa   Desa        @relation(fields: [desaId], references: [id], onDelete: Cascade)
+  source DataSource? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  attachments DokumenAttachment[]
+
+  @@index([desaId, tahun])
+  @@index([jenisDokumen])
+  @@index([status])
+  @@index([sourceId])
+  @@index([dataStatus])
+  @@map("dokumen_publik")
+}
+
+model PerangkatDesa {
+  id           String     @id @default(cuid())
+  desaId       String
+  nama         String
+  jabatan      String
+  periode      String?
+  fotoUrl      String?
+  kontakLabel  String?
+  dataStatus   DataStatus @default(demo)
+  sourceId     String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  desa   Desa        @relation(fields: [desaId], references: [id], onDelete: Cascade)
+  source DataSource? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+
+  @@index([desaId])
+  @@index([dataStatus])
+  @@index([sourceId])
+  @@map("perangkat_desa")
+}
+
+// ─── Admin Desa Claim ─────────────────────────────────────────────────────────
+
+model DesaAdminClaim {
+  id              String            @id @default(cuid())
+  desaId          String
+  userId          String
+  status          ClaimStatus       @default(PENDING)
+  method          AdminClaimMethod?
+  officialEmail   String?
+  websiteUrl      String?
+  tokenHash       String?
+  tokenExpiresAt  DateTime?
+  verifiedAt      DateTime?
+
+  // OTP tracking (for email OTP verification flow)
+  otpHash           String?   // SHA-256 hash of the 6-digit OTP; never store plaintext
+  otpFailedAttempts Int       @default(0)
+  otpResendCount    Int       @default(0)
+  otpFrozenUntil    DateTime?
+  otpLastSentAt     DateTime?
+  otpExpiresAt      DateTime?
+
+  // Rejection (structured: set by internal admin on REJECTED)
+  rejectCategory    ReasonCategory? @map("review_rejected_category")
+  rejectReason      String?         @db.Text @map("review_rejected_reason")
+  rejectInstructions String?        @db.Text @map("review_rejected_instructions")
+  reapplyAllowedAt  DateTime?
+
+  // Legacy rejection fields (kept for backward compat during transition)
+  rejectedAt      DateTime?
+  rejectionReason String?   @db.Text
+
+  // Fraud / cooldown
+  fraudCooldownUntil DateTime?
+
+  // Support review path
+  supportSubmittedAt DateTime?
+
+  // Renewal tracking (used after claim APPROVED / member VERIFIED)
+  renewalDueAt        DateTime?
+  renewalReviewStatus String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  desa Desa @relation(fields: [desaId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([desaId])
+  @@index([userId])
+  @@index([status])
+  @@map("desa_admin_claims")
+}
+
+// ─── Admin Desa Membership ────────────────────────────────────────────────────
+
+model DesaAdminMember {
+  id            String        @id @default(cuid())
+  desaId        String
+  userId        String
+  role          DesaAdminRole @default(LIMITED_ADMIN)
+  status        MemberStatus  @default(LIMITED)
+  invitedById   String?
+  verifiedById  String?
+  joinedAt      DateTime      @default(now())
+  invitedAt     DateTime?
+  acceptedAt    DateTime?
+  revokedAt     DateTime?
+  revokedReason String?       @db.Text
+  renewalDueAt  DateTime?
+  updatedAt     DateTime      @updatedAt
+
+  desa Desa @relation(fields: [desaId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([desaId, userId])
+  @@index([desaId, status])
+  @@map("desa_admin_members")
+}
+
+model DesaAdminInvite {
+  id          String       @id @default(cuid())
+  desaId      String
+  email       String
+  tokenHash   String
+  invitedById String
+  status      InviteStatus @default(PENDING)
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdAt   DateTime     @default(now())
+
+  desa Desa @relation(fields: [desaId], references: [id], onDelete: Cascade)
+
+  @@index([desaId])
+  @@index([email])
+  @@index([status])
+  @@map("desa_admin_invites")
+}
+
+// ─── Admin Desa Documents (Sprint 04-008) ────────────────────────────────────
+
+model AdminDesaDocument {
+  id              String               @id @default(cuid())
+  desaId          String
+  uploadedById    String?
+  title           String
+  category        String
+  inputMode       String               @default("DOCUMENT_UPLOAD")
+  storageKey      String?              // Supabase Storage object path
+  fileName        String?
+  fileType        String?
+  fileSize        Int?
+  status          DocumentUploadStatus @default(WAITING_VERIFIED_APPROVAL)
+  approvedById    String?              // userId of VERIFIED admin who approved
+  approvedAt      DateTime?
+  rejectedReason  String?              @db.Text
+  publishedAt     DateTime?
+  failedReason    String?              @db.Text
+  sourceTypeCode  String?
+  sourceUrl       String?
+  sourceRegistryId String?
+  sourceEvidenceJson Json?
+  structuredValuesJson Json?
+  normalizedSourceText String?         @db.Text
+  aiMappingStatus String?              // null | PENDING | DONE | FAILED
+  aiMappingResult Json?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  desa       Desa  @relation(fields: [desaId], references: [id], onDelete: Cascade)
+  uploadedBy User? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  villageDataVersions VillageDataVersion[]
+  dataAuditEvents     DesaDataAuditEvent[]
+  dataDesaRows        DataDesa[]
+
+  @@index([desaId])
+  @@index([status])
+  @@index([uploadedById])
+  @@map("admin_desa_documents")
+}
+
+model VillageDataVersion {
+  id                    String                   @id @default(cuid())
+  desaId                String
+  sourceDocumentId      String?
+  versionNumber         Int
+  status                VillageDataVersionStatus @default(REVIEW_READY)
+  title                 String
+  sourceLabel           String?
+  reviewNote            String?                  @db.Text
+  changedFields         String[]
+  proposedSnapshotJson  Json
+  beforeSnapshotJson    Json?
+  publishedSnapshotJson Json?
+  createdByUserId       String?
+  publishedByUserId     String?
+  publishedAt           DateTime?
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+
+  desa           Desa               @relation(fields: [desaId], references: [id], onDelete: Cascade)
+  sourceDocument AdminDesaDocument? @relation(fields: [sourceDocumentId], references: [id], onDelete: SetNull)
+  dataAuditEvents DesaDataAuditEvent[]
+
+  @@unique([desaId, versionNumber])
+  @@index([desaId, status, createdAt])
+  @@index([sourceDocumentId])
+  @@index([publishedAt])
+  @@map("village_data_versions")
+}
+
+model DesaDataAuditEvent {
+  id                   String   @id @default(cuid())
+  desaId               String
+  sourceDocumentId     String?
+  villageDataVersionId String?
+  actorUserId          String?
+  actorRole            String?
+  eventType            String
+  eventLabel           String?
+  previousStatus       String?
+  nextStatus           String?
+  note                 String?  @db.Text
+  metadata             Json?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  desa               Desa                @relation(fields: [desaId], references: [id], onDelete: Cascade)
+  sourceDocument     AdminDesaDocument?  @relation(fields: [sourceDocumentId], references: [id], onDelete: SetNull)
+  villageDataVersion VillageDataVersion? @relation(fields: [villageDataVersionId], references: [id], onDelete: SetNull)
+
+  @@index([desaId, createdAt])
+  @@index([sourceDocumentId, createdAt])
+  @@index([villageDataVersionId, createdAt])
+  @@index([eventType, createdAt])
+  @@map("desa_data_audit_events")
+}
+
+// ─── Admin Desa Notifications (Sprint 04-008) ─────────────────────────────────
+
+model AdminDesaNotification {
+  id        String    @id @default(cuid())
+  userId    String
+  desaId    String?
+  type      String
+  channel   String    @default("in_app")
+  title     String
+  body      String    @db.Text
+  metadata  Json?
+  isRead    Boolean   @default(false)
+  readAt    DateTime?
+  sentAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([desaId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("admin_desa_notifications")
+}
+
+// ─── Internal Admin Audit Log ─────────────────────────────────────────────────
+
+model AdminClaimAudit {
+  id                      String   @id @default(cuid())
+  desaId                  String?
+  actorUserId             String?
+  actorRole               String?
+  actorDisplayNameSnapshot String?
+  targetUserId            String?
+  entityType              String?
+  entityId                String?
+  claimId                 String?
+  eventType               String
+  method                  String?
+  previousStatus          String?
+  nextStatus              String?
+  evidenceType            String?
+  evidenceUrl             String?
+  evidenceHash            String?
+  ipAddress               String?
+  userAgent               String?
+  location                String?
+  reasonCategory          String?
+  reasonText              String?
+  beforeSnapshotJson      Json?
+  afterSnapshotJson       Json?
+  metadata                Json?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@index([desaId])
+  @@index([actorUserId])
+  @@index([eventType])
+  @@index([createdAt])
+  @@map("admin_claim_audits")
+}
+
+model FakeAdminReport {
+  id             String       @id @default(cuid())
+  desaId         String
+  reportedUserId String?
+  reporterUserId String?
+  reason         String
+  description    String?      @db.Text
+  evidenceUrl    String?
+  reporterEmail  String?
+  status         ReportStatus @default(OPEN)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([desaId])
+  @@index([reportedUserId])
+  @@index([status])
+  @@map("fake_admin_reports")
+}
+
+model DokumenAttachment {
+  id           String   @id @default(cuid())
+  dokumenId    String
+  uploadedById String?
+  storagePath  String
+  fileName     String
+  fileType     String
+  fileSize     Int
+  fileHash     String?
+  createdAt    DateTime @default(now())
+
+  dokumen DokumenPublik @relation(fields: [dokumenId], references: [id], onDelete: Cascade)
+
+  @@index([dokumenId])
+  @@index([uploadedById])
+  @@map("dokumen_attachments")
+}
+
+model AIReviewResult {
+  id              String   @id @default(cuid())
+  targetType      String
+  targetId        String
+  model           String
+  summary         String?  @db.Text
+  suggestedStatus String?
+  confidence      String?
+  riskFlags       Json?
+  extractedFields Json?
+  rawResult       Json?
+  createdAt       DateTime @default(now())
+
+  @@index([targetType, targetId])
+  @@map("ai_review_results")
+}
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║  FLEXIBLE VILLAGE TEMPLATE FOUNDATION — MIGRATION APPLIED               ║
+// ║  Migration: 20260510141750_flexible_village_template_components          ║
+// ║  Applied to: Supabase cloud (aws-1-ap-south-1.pooler.supabase.com)      ║
+// ║  Seed: node prisma/seed-templates.mjs ✓ (3 templates, 4 assignments)    ║
+// ║  Status: ACTIVE — all 6 models live in production DB                    ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+//
+// ─── Architecture ────────────────────────────────────────────────────────────
+//
+//   Desa
+//    ├─ DesaDetailTemplateAssignment → VillageDetailTemplate
+//    │                                  ├─ VillageDetailComponent[]
+//    │                                  │   └─ DetailFieldStandard[]
+//    ├─ DesaDetailComponentVisibility (override show/hide per component)
+//    └─ DataDesa[] (field values — WRITE PIPELINE NOT YET IMPLEMENTED)
+//
+// ─── NEXT: DataDesa write pipeline (intake → DataDesa rows on submit) ────────
+// See: docs/bmad/reports/sprint-05-flexible-village-data-admin-center-report.md
+//
+// ─── VillageDetailTemplate ───────────────────────────────────────────────────
+model VillageDetailTemplate {
+  id          String   @id @default(cuid())
+  key         String   @unique   // "TEMPLATE_UMUM_DESA"
+  name        String
+  description String?  @db.Text
+  version     Int      @default(1)
+  status      VillageDetailTemplateStatus @default(ACTIVE)
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+//
+  components      VillageDetailComponent[]
+  desaAssignments DesaDetailTemplateAssignment[]
+//
+  @@map("village_detail_templates")
+}
+//
+model VillageComponentCatalog {
+  id            String   @id @default(cuid())
+  componentKey  String   @unique
+  label         String
+  description   String?  @db.Text
+  componentType String   @default("section")
+  isDefaultVisible Boolean @default(true)
+  displayOrder  Int      @default(0)
+  rendererType  String   @default("identity_grid")
+  previewVariant String  @default("identity")
+  detailSlot    String   @default("first_view")
+  navLabel      String?
+  anchorId      String?
+  publicGroupKey String?
+  publicTabKey  String?
+  highlightFieldKeys Json?
+  renderConfigJson Json?
+  status        String   @default("ACTIVE")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+//
+  fields             VillageComponentCatalogField[]
+  templatePlacements VillageDetailComponent[]
+//
+  @@map("village_component_catalog")
+}
+//
+model VillageComponentCatalogField {
+  id                 String   @id @default(cuid())
+  catalogComponentId String
+  fieldKey           String
+  label              String
+  valueType          String
+  sourcePolicyJson   Json?
+  validationRules    Json?
+  isRequired         Boolean  @default(false)
+  isPublicVisible    Boolean  @default(true)
+  isPublishableNow   Boolean  @default(false)
+  displayOrder       Int      @default(0)
+  status             String   @default("ACTIVE")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+//
+  component      VillageComponentCatalog  @relation(fields: [catalogComponentId], references: [id])
+  templateFields DetailFieldStandard[]
+//
+  @@unique([catalogComponentId, fieldKey])
+  @@map("village_component_catalog_fields")
+}
+//
+// ─── VillageDetailComponent (section/komponen di dalam template) ─────────────
+model VillageDetailComponent {
+  id               String   @id @default(cuid())
+  templateId       String
+  catalogComponentId String?
+  componentKey     String   // "identitas"|"demografi"|"anggaran"|"profil_desa"|dst
+  label            String   // "Identitas & Wilayah"
+  description      String?  @db.Text
+  componentType    String   @default("section")
+  sourcePolicyJson Json?
+  isDefaultVisible Boolean  @default(true)
+  displayOrder     Int      @default(0)
+  status           String   @default("ACTIVE")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+//
+  template         VillageDetailTemplate          @relation(fields: [templateId], references: [id])
+  catalogComponent VillageComponentCatalog?      @relation(fields: [catalogComponentId], references: [id])
+  fieldStandards   DetailFieldStandard[]
+  desaVisibility   DesaDetailComponentVisibility[]
+  dataDesa         DataDesa[]
+//
+  @@unique([templateId, componentKey])
+  @@map("village_detail_components")
+}
+//
+// ─── DetailFieldStandard ─────────────────────────────────────────────────────
+model DetailFieldStandard {
+  id               String   @id @default(cuid())
+  templateId       String
+  componentId      String
+  catalogFieldId   String?
+  fieldKey         String
+  label            String
+  valueType        String   // "string" | "number" | "url" | "text" | "json"
+  sourcePolicyJson Json?
+  validationRules  Json?
+  isRequired       Boolean  @default(false)
+  isPublicVisible  Boolean  @default(true)
+  isPublishableNow Boolean  @default(false)
+  displayOrder     Int      @default(0)
+  status           String   @default("ACTIVE")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+//
+  component    VillageDetailComponent        @relation(fields: [componentId], references: [id])
+  catalogField VillageComponentCatalogField? @relation(fields: [catalogFieldId], references: [id])
+//
+  @@unique([templateId, componentId, fieldKey])
+  @@map("detail_field_standards")
+}
+//
+// ─── DesaDetailTemplateAssignment ────────────────────────────────────────────
+model DesaDetailTemplateAssignment {
+  id         String   @id @default(cuid())
+  desaId     String   @unique   // satu template aktif per desa
+  templateId String
+  isActive   Boolean  @default(true)
+  assignedAt DateTime @default(now())
+  reason     String?
+//
+  desa     Desa                  @relation(fields: [desaId], references: [id], onDelete: Cascade)
+  template VillageDetailTemplate @relation(fields: [templateId], references: [id])
+//
+  @@map("desa_detail_template_assignments")
+}
+//
+// ─── DesaDetailComponentVisibility (show/hide per desa, NOT per data) ─────────
+model DesaDetailComponentVisibility {
+  id          String   @id @default(cuid())
+  desaId      String
+  templateId  String
+  componentId String
+  isVisible   Boolean   // overrides VillageDetailComponent.isDefaultVisible
+  reason      String?   // "Desa ini tidak ingin menampilkan anggaran"
+  updatedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+//
+  desa      Desa                   @relation(fields: [desaId], references: [id], onDelete: Cascade)
+  component VillageDetailComponent @relation(fields: [componentId], references: [id])
+//
+  @@unique([desaId, componentId])
+  @@map("desa_detail_component_visibility")
+}
+//
+// ─── DataDesa (data values, terpisah dari visibility komponen) ─────────────────
+model DataDesa {
+  id              String         @id @default(cuid())
+  desaId          String
+  templateId      String
+  componentId     String
+  fieldStandardId String?
+  fieldKey        String
+  valueJson       Json?
+  valueText       String?        @db.Text
+  sourceId        String?
+  sourceDocumentId String?
+  sourceUrl       String?
+  sourceRegistryId String?
+  sourceTypeCode  String?
+  sourceEvidenceJson Json?
+  sourceLabel     String?
+  reviewNote      String?        @db.Text
+  status          DataDesaStatus @default(DRAFT)
+  isActive        Boolean        @default(true)
+  publishedAt     DateTime?
+  reviewedById    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+//
+  desa           Desa                   @relation(fields: [desaId], references: [id], onDelete: Cascade)
+  component      VillageDetailComponent @relation(fields: [componentId], references: [id])
+  sourceDocument AdminDesaDocument?     @relation(fields: [sourceDocumentId], references: [id], onDelete: SetNull)
+//
+  @@index([desaId, fieldKey, status])
+  @@index([desaId, componentId])
+  @@index([sourceDocumentId])
+  @@map("data_desa")
+}
+//
+// ─── New enums (tambahkan ke section Enums di bawah) ─────────────────────────
+enum VillageDetailTemplateStatus {
+  DRAFT
+  ACTIVE
+  DEPRECATED
+  ARCHIVED
+}
+
+enum DataDesaStatus {
+  DRAFT
+  IN_REVIEW
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
+//
+// ─── Template design (runtime default TEMPLATE_UMUM_DESA) ───────────────────
+// 1.  identitas      — Identitas & Wilayah     (websiteUrl, kategori, tahunData, kec, kab, prov)
+// 2.  demografi      — Demografi                (jumlahPenduduk, jumlahKK, jumlahDusun, RT, RW)
+// 3.  sumber_dokumen — Sumber & Dokumen         (reads DataSource[], DokumenPublik[])
+// 4.  transparansi   — Transparansi & Skor      (skorTransparansi computed, dokumen detail)
+// 5.  anggaran       — Anggaran & Realisasi     (totalAnggaran, terealisasi, persentaseSerapan)
+// 6.  pendapatan     — Sumber Pendapatan        (danaDesa, add, pades, bantuanKeuangan)
+// 7.  kinerja        — Kinerja & Rincian APBDes (apbdesItems, outputFisik, riwayat)
+// 8.  profil_desa    — Profil & Kelengkapan     (kontak, perangkat, potensi, fasilitas, aset, bumdes)
+// 9.  panduan_warga  — Panduan Warga            (static + computed)
+// 10. suara_warga    — Suara Warga              (citizen voices, separate model)
+//
+// ─── Template assignments (seed via prisma/seed-templates.mjs) ───────────────
+// arjasari, baros          → DESA_WISATA_TEMPLATE   (profil fields publishable)
+// batukarut, lebakwangi    → DESA_TRANSPARAN_TEMPLATE (anggaran fields publishable)
+// all desa default assignment → TEMPLATE_UMUM_DESA
+// baros override           → anggaran component isVisible: false
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum DataStatus {
+  demo
+  imported
+  needs_review
+  verified
+  outdated
+  rejected
+}
+
+enum VillageDataVersionStatus {
+  REVIEW_READY
+  PUBLISHED
+  REPLACED
+  REJECTED
+  FAILED
+}
+
+enum SourceType {
+  demo
+  manual
+  official_website
+  official_document
+  kecamatan_page
+  article_page
+  archive_page
+  other
+}
+
+enum ScopeType {
+  desa
+  kecamatan
+  kabupaten
+  provinsi
+  national
+  other
+}
+
+enum AccessStatus {
+  accessible
+  unreachable
+  broken
+  unknown
+  requires_review
+}
+
+enum DataAvailability {
+  none
+  profile_only
+  documents_only
+  budget_summary
+  budget_detail
+  mixed
+  unknown
+}
+
+enum StatusSerapan {
+  baik
+  sedang
+  rendah
+  unknown
+}
+
+enum DocumentStatus {
+  tersedia
+  belum
+  unknown
+  needs_review
+}
+
+enum DocumentType {
+  apbdes
+  realisasi
+  rkpdes
+  rpjmdes
+  perdes
+  lppd
+  profile
+  other
+}
+
+// Claim lifecycle — state of the Admin Desa claim application
+enum ClaimStatus {
+  PENDING    // claim submitted, awaiting verification signal
+  IN_REVIEW  // verification signal received, awaiting internal admin review
+  REJECTED   // internal admin rejected with reason + instructions
+  APPROVED   // internal admin approved — triggers membership VERIFIED
+}
+
+// Membership lifecycle — active access state of Admin Desa member
+enum MemberStatus {
+  LIMITED  // invite-only or verification-in-progress, restricted access
+  VERIFIED // fully verified, one per desa
+  REVOKED  // access removed, history preserved (no hard delete)
+  EXPIRED  // verified access expired (e.g. renewal not completed)
+}
+
+enum ReasonCategory {
+  WEBSITE_NOT_OFFICIAL
+  WEBSITE_MISMATCH
+  TOKEN_NOT_VALID
+  EMAIL_NOT_CONVINCING
+  DOCUMENT_NOT_SUFFICIENT
+  SOURCE_CONFLICT
+  SUSPICIOUS_ACTIVITY
+  RENEWAL_FAILED
+  OTHER
+}
+
+enum DocumentUploadStatus {
+  WAITING_VERIFIED_APPROVAL // uploaded by LIMITED, waiting for VERIFIED approval
+  PROCESSING                // in internal admin review / AI mapping queue
+  PUBLISHED                 // approved, mapped, published
+  REJECTED                  // rejected by VERIFIED before internal review
+  FAILED                    // rejected with user-safe reason
+}
+
+enum AdminClaimMethod {
+  OFFICIAL_EMAIL
+  WEBSITE_TOKEN
+  SUPPORT_REVIEW
+  INVITE
+}
+
+enum DesaAdminRole {
+  LIMITED_ADMIN
+  VERIFIED_ADMIN
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWING
+  RESOLVED
+  REJECTED
+}
+
+// ─── NextAuth v5 required tables ──────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}

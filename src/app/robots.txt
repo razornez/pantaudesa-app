@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /desa-admin
+Disallow: /profil/saya
+Disallow: /login
+Disallow: /daftar
+Disallow: /lupa-pin
+Disallow: /api/
+
+Sitemap: https://pantaudesa.id/sitemap.xml
