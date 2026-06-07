@@ -24,15 +24,24 @@ npm run dev
 
 1. **Fork** repo & buat branch dari `main`: `git checkout -b fix/nama-singkat`.
 2. Buat perubahan yang fokus & kecil (satu PR = satu tujuan).
-3. Pastikan semua **gate lulus** sebelum push:
+3. Pastikan semua **gate lulus** sebelum push (CI juga mengeceknya otomatis):
    ```bash
    npx tsc --noEmit      # tidak ada error TypeScript
    npm run lint          # tidak ada error/warning lint
    npm run test          # semua test lulus
-   npm run build         # production build sukses
    ```
 4. Tulis pesan commit yang jelas (boleh Bahasa Indonesia atau Inggris). Format yang disukai: `tipe(scope): ringkasan` — mis. `fix(desa): perbaiki badge kelengkapan`.
 5. Buka PR ke `main` dengan deskripsi: apa yang diubah, kenapa, dan cara mengetesnya.
+
+> ℹ️ **Bagaimana PR-mu di-integrasikan.** Repo ini adalah cermin publik dari repo
+> kerja internal maintainer. Karena itu **PR yang diterima tidak selalu di-klik
+> "Merge"** — sebagai gantinya maintainer menerapkan perubahanmu ke repo
+> internal, lalu perubahan itu muncul di sini pada commit `sync:` berikutnya.
+> PR-mu akan **ditutup dengan referensi ke commit tersebut, dan kamu tetap
+> dikreditkan** (Co-Authored-By / catatan di commit). Jadi kalau PR di-*close*
+> bukan di-*merge*, jangan khawatir — selama dirujuk ke commit `sync:`, artinya
+> perubahanmu **sudah masuk**. Ini menjaga riwayat tetap konsisten satu arah dan
+> mencegah konflik. Jangan force-push ke `main`; itu hanya milik maintainer.
 
 ## Standar kode
 
