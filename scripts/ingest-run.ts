@@ -27,6 +27,10 @@ async function main() {
   const { KecamatanBandungAdapter } = await import("@/lib/adapters/kecamatan-bandung-adapter");
   const { NominatimGeocodeAdapter } = await import("@/lib/adapters/nominatim-geocode-adapter");
   const { LocationIQGeocodeAdapter } = await import("@/lib/adapters/locationiq-geocode-adapter");
+  const { KemendesaIdmAdapter } = await import("@/lib/adapters/kemendesa-idm-adapter");
+  const { OpenMeteoElevationAdapter } = await import("@/lib/adapters/openmeteo-elevation-adapter");
+  const { DukcapilGisAdapter } = await import("@/lib/adapters/dukcapil-gis-adapter");
+  const { DukcapilGeometryAdapter } = await import("@/lib/adapters/dukcapil-geometry-adapter");
   const { runIngestion } = await import("@/lib/adapters/ingestion-runner");
   if (!db) throw new Error("Database tidak tersedia.");
 
@@ -102,6 +106,10 @@ async function main() {
     new NominatimGeocodeAdapter(), // free OSM geocoder (local IP only — blocked on cloud)
     new LocationIQGeocodeAdapter(), // keyed OSM geocoder (works from cloud; needs LOCATIONIQ_KEY)
     new KemendesaDanaDesaAdapter(),
+    new KemendesaIdmAdapter(),
+    new OpenMeteoElevationAdapter(),
+    new DukcapilGisAdapter(),
+    new DukcapilGeometryAdapter(),
     ...(hasBandung ? [kecAdapter] : []),
     new OpenSIDAdapter(),
   ].filter((a) => !only || a.id.includes(only));

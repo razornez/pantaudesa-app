@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Upload, ShieldCheck, Info, CheckCircle2, Loader2, X } from "lucide-react";
+import { Upload, ShieldCheck, CheckCircle2, Loader2, X, Heart } from "lucide-react";
 import { DOCUMENT_CATEGORIES } from "@/lib/storage/upload-validation";
 
 interface Props {
@@ -16,6 +16,51 @@ interface Props {
   formatLabels: string[];
   maxFileMb: number;
 }
+
+const DATA_SOURCES = [
+  {
+    label: "DJPK Kemenkeu",
+    detail: "Dana Desa & transfer fiskal tahunan",
+    dot: "#10B981",
+    bg: "rgba(16,185,129,.08)",
+    ring: "rgba(16,185,129,.20)",
+  },
+  {
+    label: "Kemendesa IDM 2024",
+    detail: "Kategori & indeks desa membangun",
+    dot: "#4F46E5",
+    bg: "rgba(79,70,229,.08)",
+    ring: "rgba(79,70,229,.20)",
+  },
+  {
+    label: "Dukcapil GIS Kemendagri",
+    detail: "Kependudukan, KK, luas & batas wilayah",
+    dot: "#14B8A6",
+    bg: "rgba(20,184,166,.08)",
+    ring: "rgba(20,184,166,.20)",
+  },
+  {
+    label: "OpenStreetMap",
+    detail: "Koordinat GPS & geometri desa",
+    dot: "#84CC16",
+    bg: "rgba(132,204,22,.08)",
+    ring: "rgba(132,204,22,.22)",
+  },
+  {
+    label: "Open-Meteo",
+    detail: "Topografi, ketinggian & elevasi lahan",
+    dot: "#0EA5E9",
+    bg: "rgba(14,165,233,.08)",
+    ring: "rgba(14,165,233,.20)",
+  },
+  {
+    label: "OpenSID website desa",
+    detail: "Kepala desa, perangkat & profil resmi",
+    dot: "#8B5CF6",
+    bg: "rgba(139,92,246,.08)",
+    ring: "rgba(139,92,246,.20)",
+  },
+] as const;
 
 type Status = "idle" | "submitting" | "done" | "error";
 
@@ -74,6 +119,68 @@ export default function PublicContributeForm({
 
   return (
     <section className="rounded-2xl border border-indigo-100 bg-white shadow-sm overflow-hidden">
+      {/* Provenance — always visible */}
+      <div className="px-5 pt-5 pb-4 border-b border-slate-100">
+        <p className="text-[10.5px] font-semibold uppercase tracking-[.14em] text-indigo-500 mb-2">
+          Data yang sudah kami kumpulkan
+        </p>
+        <p className="text-[13px] leading-relaxed text-slate-700 mb-4">
+          Data <span className="font-semibold text-slate-800">{desaNama}</span> yang kamu baca ini
+          dikumpulkan susah payah dari{" "}
+          <span className="font-semibold text-indigo-700">6 sumber resmi berbeda</span> — supaya
+          kamu bisa memantau desamu tanpa harus mencari sendiri.
+        </p>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {DATA_SOURCES.map((s) => (
+            <div
+              key={s.label}
+              className="flex items-start gap-2.5 rounded-xl px-3 py-2.5"
+              style={{ background: s.bg, boxShadow: `inset 0 0 0 1px ${s.ring}` }}
+            >
+              <span
+                className="mt-[5px] h-2 w-2 flex-shrink-0 rounded-full"
+                style={{ background: s.dot }}
+                aria-hidden
+              />
+              <div className="min-w-0">
+                <p className="text-[12px] font-semibold text-slate-800 leading-tight">{s.label}</p>
+                <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">{s.detail}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        {missing.length > 0 ? (
+          <div
+            className="mt-3 flex items-start gap-2.5 rounded-xl px-3.5 py-3"
+            style={{ background: "rgba(99,102,241,.06)", boxShadow: "inset 0 0 0 1px rgba(99,102,241,.18)" }}
+          >
+            <Heart size={14} className="mt-0.5 flex-shrink-0 text-indigo-500" aria-hidden />
+            <div className="text-[11.5px] leading-relaxed text-indigo-900">
+              <span className="font-semibold">
+                Tapi dari {DATA_SOURCES.length} sumber itu, masih ada yang belum terjangkau:
+              </span>{" "}
+              {missing.join(", ")}.{" "}
+              <span className="text-indigo-700">
+                Kalau kamu punya dokumen resmi desa ini, bantu kami lengkapi — datamu sangat berarti
+                bagi warga yang membutuhkan.
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div
+            className="mt-3 flex items-start gap-2.5 rounded-xl px-3.5 py-3"
+            style={{ background: "rgba(16,185,129,.06)", boxShadow: "inset 0 0 0 1px rgba(16,185,129,.18)" }}
+          >
+            <Heart size={14} className="mt-0.5 flex-shrink-0 text-emerald-600" aria-hidden />
+            <p className="text-[11.5px] leading-relaxed text-emerald-900">
+              <span className="font-semibold">Data desa ini cukup lengkap</span>, tapi selalu ada
+              yang bisa diperbaiki. Kalau kamu punya dokumen resmi terbaru, tetap bantu kami
+              perbarui.
+            </p>
+          </div>
+        )}
+      </div>
+
       {/* Header / toggle */}
       <button
         type="button"
@@ -119,16 +226,6 @@ export default function PublicContributeForm({
               </p>
             </div>
           </div>
-
-          {missing.length > 0 && (
-            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-sky-200 bg-sky-50 px-3.5 py-3">
-              <Info size={16} className="mt-0.5 flex-shrink-0 text-sky-600" />
-              <p className="text-xs leading-relaxed text-sky-900">
-                <span className="font-bold">Data yang masih kurang:</span> {missing.join(" · ")}.
-                Dokumen yang memuat data ini paling membantu.
-              </p>
-            </div>
-          )}
 
           {status === "done" ? (
             <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4">

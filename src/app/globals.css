@@ -619,6 +619,7 @@ summary {
 .stripe-warn  { border-left: 3px solid var(--color-warn-500); }
 .stripe-watch { border-left: 3px solid var(--color-watch-500); }
 .stripe-brand { border-left: 3px solid var(--color-brand-600); }
+.stripe-teal  { border-left: 3px solid var(--color-teal-500); }
 .stripe-ink   { border-left: 3px solid var(--color-ink-4); }
 
 /* Icon chip with gradient */

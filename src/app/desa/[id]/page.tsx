@@ -157,6 +157,44 @@ export default async function DesaDetailPage({ params }: Props) {
         ? Math.round((desaView.terealisasi / desaView.totalAnggaran) * 100)
         : desa.persentaseSerapan;
 
+  // Derived transparency score — computed from available published data when no
+  // official score exists. Differentiates desa with public websites / contact info
+  // from those with only regulatory data (DJPK, IDM, Dukcapil).
+  // skorTransparansi is intentionally omitted from the DB read (see desa-read.ts:799)
+  // so desa.skorTransparansi is always undefined — we always compute here.
+  desaView.skorTransparansi = (() => {
+    // ketepatan: recency of official data sources
+    const tahun = readPublishedNumber(publishedValues, "tahunData");
+    const hasIdm = readPublishedNumber(publishedValues, "idmScore") !== null;
+    const ketepatan = hasIdm
+      ? (tahun !== null && tahun >= 2024 ? 82 : 65)
+      : (publishedDanaDesa !== null ? 60 : 45);
+
+    // kelengkapan: public access to village information
+    const hasDanaDesa = publishedDanaDesa !== null;
+    const hasWebsite = !!desa.websiteUrl;
+    const hasKepalaDesa = readPublishedString(publishedValues, "kepalaDesa") !== null;
+    const hasDokumen = (desa.dokumen?.length ?? 0) > 0;
+    const kelengkapan = Math.min(100,
+      (hasDanaDesa ? 25 : 0) +
+      (hasWebsite ? 35 : 0) +
+      (hasKepalaDesa ? 25 : 0) +
+      (hasDokumen ? 15 : 0),
+    );
+
+    // konsistensi: budget and governance data coherence across sources
+    const hasSerapan = desaView.totalAnggaran > 0;
+    const konsistensi = hasDanaDesa && hasIdm
+      ? (hasSerapan ? 78 : 68)
+      : (hasDanaDesa ? 58 : 42);
+
+    // responsif: citizen communication channels available
+    const responsif = hasWebsite ? 62 : (hasKepalaDesa ? 52 : 44);
+
+    const total = Math.round((ketepatan + kelengkapan + konsistensi + responsif) / 4);
+    return { total, ketepatan, kelengkapan, konsistensi, responsif, isDerived: true };
+  })();
+
   const visibleComponents = runtimeManifest.visibleComponents;
 
   // Real coordinates from DataDesa (for map chapter + source attribution)

@@ -137,6 +137,8 @@ export interface SkorTransparansi {
   kelengkapan: number;
   responsif: number;
   konsistensi: number;
+  /** true when score was computed by PantauDesa from available data, not officially measured */
+  isDerived?: boolean;
 }
 
 export interface PendapatanDesa {
@@ -187,6 +189,8 @@ export interface Desa {
   jumlahDataReal?: number;
   /** Dana Desa pagu from DJPK (Rp, 0 if not yet ingested) */
   paguDanaDesa?: number;
+  /** Official website URL (OpenSID or custom) — null when desa has no website */
+  websiteUrl?: string | null;
 }
 
 

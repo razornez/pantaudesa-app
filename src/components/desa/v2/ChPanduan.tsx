@@ -1,4 +1,4 @@
-import { BookOpen, MessageSquareWarning, ClipboardCheck, Megaphone, CheckCircle2, ClipboardList, HelpCircle } from "lucide-react";
+import { BookOpen, MessageSquareWarning, ClipboardCheck, Megaphone, CheckCircle2, ClipboardList, HelpCircle, TriangleAlert, ShieldAlert } from "lucide-react";
 import type { Desa } from "@/lib/types";
 import { getExpectations, type ExpectedStatus } from "@/lib/expectations";
 import ChapterPanel, { type SourceNote } from "./ChapterPanel";
@@ -98,6 +98,69 @@ export default function ChPanduan({ desa, chapterNo, sourceNote }: { desa: Desa;
           Daftar ini panduan untuk bertanya dengan tenang — bukan bukti pelanggaran. Selalu cek
           aturan, musyawarah, dan dokumen desa terkait sebelum membuat kesimpulan.
         </p>
+      </div>
+
+      {/* Escalation timeline — 3 levels personalized to this desa */}
+      <div className="mt-6 reveal reveal-6">
+        <p className="eyebrow mb-5">Kalau lapor — ke mana dulu?</p>
+        <div className="relative">
+          <div
+            className="absolute bottom-3 top-3 w-px"
+            style={{ left: 19, background: "linear-gradient(180deg, var(--color-good-500), var(--color-warn-500), var(--color-watch-500))" }}
+            aria-hidden
+          />
+          <div className="space-y-3">
+            <div className="tile tile-good stripe-good flex items-start gap-5 p-5">
+              <div
+                className="relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-[14px] font-semibold text-white shadow-lux-2"
+                style={{ background: "linear-gradient(140deg, var(--color-good-500), var(--color-good-700))" }}
+              >
+                1
+              </div>
+              <div className="flex-1 pt-1 min-w-0">
+                <p className="mb-1 text-[11px] font-semibold uppercase tracking-[.12em] text-good-700">Hubungi pertama</p>
+                <p className="text-[13px] font-medium text-ink-1">Kepala Desa {desa.nama}</p>
+                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-3">
+                  Untuk masalah infrastruktur, pelayanan warga, atau hal-hal di tingkat desa. Datang ke balai desa.
+                </p>
+              </div>
+            </div>
+
+            <div className="tile tile-warn stripe-warn flex items-start gap-5 p-5">
+              <div
+                className="relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-[14px] font-semibold text-white shadow-lux-2"
+                style={{ background: "linear-gradient(140deg, var(--color-warn-500), var(--color-warn-700))" }}
+              >
+                <TriangleAlert size={16} aria-hidden />
+              </div>
+              <div className="flex-1 pt-1 min-w-0">
+                <p className="mb-1 text-[11px] font-semibold uppercase tracking-[.12em] text-warn-700">Jika tidak direspons</p>
+                <p className="text-[13px] font-medium text-ink-1">Camat {desa.kecamatan} · BPD {desa.nama}</p>
+                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-3">
+                  BPD mengawasi kepala desa. Kecamatan mengawasi desa. Hubungi keduanya paralel.
+                </p>
+              </div>
+            </div>
+
+            <div className="tile tile-watch stripe-watch flex items-start gap-5 p-5">
+              <div
+                className="relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-[14px] font-semibold text-white shadow-lux-2"
+                style={{ background: "linear-gradient(140deg, var(--color-watch-500), var(--color-watch-700))" }}
+              >
+                <ShieldAlert size={16} aria-hidden />
+              </div>
+              <div className="flex-1 pt-1 min-w-0">
+                <p className="mb-1 text-[11px] font-semibold uppercase tracking-[.12em] text-watch-700">Eskalasi terakhir</p>
+                <p className="text-[13px] font-medium text-ink-1">
+                  Inspektorat {desa.kabupaten} · Ombudsman {desa.provinsi}
+                </p>
+                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-3">
+                  Untuk dugaan pelanggaran administrasi atau pelayanan publik yang tidak tertangani.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </ChapterPanel>
   );

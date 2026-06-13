@@ -46,40 +46,63 @@ export class OpenSIDAdapter implements DataAdapter {
   }
 
   /**
-   * Kepala Desa name from the homepage. Handles both layouts seen on OpenSID sites:
-   *   A) "Kepala Desa: NAME"
-   *   B) attendance/staff widget "NAME[, gelar] Kepala Desa" (name precedes title)
-   * Validates the capture so attendance junk ("Belum Rekam Kehadiran …") is rejected.
+   * Kepala Desa from the OpenSID homepage `var config = {...}` JS object.
+   * This is the most reliable source — it’s OpenSID’s own DB field (`nama_kepala_desa`)
+   * served directly into the page as structured JSON, not scraped from visible text.
+   */
+  private parseKadesFromConfig(home: string): string | null {
+    // OpenSID embeds: var config = {"nama_kepala_desa":"...", ...};
+    const m = home.match(/var\s+config\s*=\s*(\{[\s\S]*?\});/);
+    if (!m) return null;
+    try {
+      const cfg = JSON.parse(m[1]) as Record<string, unknown>;
+      const raw = typeof cfg.nama_kepala_desa === "string" ? cfg.nama_kepala_desa.trim() : null;
+      if (!raw || raw.length < 3) return null;
+      // Strip leading honorifics (Pj., H., Hj., Dr., Drs., etc.) and trailing degrees (S.E., S.T., M.M., etc.)
+      let cleaned = raw
+        .replace(/^(?:Pj\.|Plt\.|H\.|Hj\.|Dr\.|Drs\.|Ir\.)\s*/i, "")
+        .replace(/,?\s*[A-Z][A-Za-z.]{1,6}(,\s*[A-Z][A-Za-z.]{1,6})*\.?\s*$/, "")
+        .trim();
+      return cleaned.length >= 3 ? this.titleCase(cleaned) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Kepala Desa name from visible homepage text — fallback only.
+   * Only handles Pattern A ("Kepala Desa: NAME") since Pattern B (name before label)
+   * is too noisy (article alt-text, nav items, etc. frequently match).
    */
   private parseKepalaDesa(home: string): string | null {
-    const text = home.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
-    // Label/non-name words trimmed from both ends of a candidate (e.g. the
-    // "Pemerintah Desa" prefix or a "Sambutan"/"Selamat Datang" heading).
-    const STOP =
-      /^(pemerintah|desa|kecamatan|kabupaten|provinsi|kantor|jabatan|nama|nip|status|hadir|belum|rekam|kehadiran|login|beranda|profil|profile|publikasi|galeri|berita|sambutan|selamat|datang|website|sekretaris|kasi|kasie|kaur|kadus|dusun|kepala|bapak|ibu|bpk|administrator|aparatur|panitia|pemilih|camat|terpilih|pendamping|calon|data|tetap|pilkades|sebagai|pemilihan)$/i;
-    // Reject if the candidate string contains obviously non-name tokens
-    const JUNK = /\bdata\b|\bpemilih\b|\bpanitia\b|\baparatur\b|\bcamat\b|\bterpilih\b|\bsekretaris jenderal\b|\bkecamatan\b|\bkabupaten\b|\badministrator\b/i;
-    const finalize = (raw: string): string | null => {
-      if (JUNK.test(raw)) return null;
-      const ws = raw.trim().split(/\s+/).filter(Boolean);
-      while (ws.length && STOP.test(ws[0].replace(/[.,]/g, ""))) ws.shift();
-      while (ws.length && STOP.test(ws[ws.length - 1].replace(/[.,]/g, ""))) ws.pop();
-      if (ws.length < 2 || ws.length > 4) return null; // max 4 words for a person’s name
-      if (!ws.every((w) => /^[A-Z][A-Za-z.’’]*,?$/.test(w))) return null;
-      const name = ws.join(" ").replace(/,\s*[A-Z][A-Za-z.]{0,4}\.?$/, "").replace(/,$/, "").trim();
-      return name.split(/\s+/).length >= 2 ? this.titleCase(name) : null;
-    };
-    // Pattern B (staff/attendance widget): capitalized words immediately before "Kepala Desa".
-    for (const m of text.matchAll(/((?:[A-Z][A-Za-z.'’]*,?\s+){2,6})Kepala Desa\b/g)) {
-      const r = finalize(m[1]);
-      if (r) return r;
-    }
-    // Pattern A: "Kepala Desa[:] NAME".
-    for (const m of text.matchAll(/Kepala Desa\s*[:\-]?\s+((?:[A-Z][A-Za-z.'’]*,?\s*){2,5})/g)) {
-      const r = finalize(m[1]);
+    // Strip image tags entirely first — alt text is a major noise source.
+    const text = home
+      .replace(/<img[^>]*>/gi, "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ");
+
+    // Pattern A only: "Kepala Desa[:] NAME" — reliable, name follows the label.
+    for (const m of text.matchAll(/Kepala Desa\s*[:\-]?\s+((?:[A-Z][A-Za-z.’’]*,?\s*){2,5})/g)) {
+      const r = this.finalizeName(m[1]);
       if (r) return r;
     }
     return null;
+  }
+
+  // Shared validation: trim stop-words, validate word shapes, return title-cased name.
+  private finalizeName(raw: string): string | null {
+    const STOP =
+      /^(pemerintah|desa|kecamatan|kabupaten|provinsi|kantor|jabatan|nama|nip|status|hadir|belum|rekam|kehadiran|login|beranda|profil|profile|publikasi|galeri|berita|sambutan|selamat|datang|website|sekretaris|kasi|kasie|kaur|kadus|dusun|kepala|bapak|ibu|bpk|administrator|aparatur|panitia|pemilih|camat|terpilih|pendamping|calon|data|tetap|pilkades|sebagai|pemilihan|rapat|koordinasi|kunjungan|belajar|perpanjangan|masa|lakukan|kegiatan|settings|admin|berita|galeri|agenda|pengumuman|sosialisasi|musyawarah)$/i;
+    const JUNK =
+      /\b(data|pemilih|panitia|aparatur|camat|terpilih|kecamatan|kabupaten|administrator|rapat|koordinasi|kunjungan|belajar|perpanjangan|lakukan|kegiatan|settings|admin|berita|galeri|agenda|pengumuman|sosialisasi|musyawarah)\b/i;
+    if (JUNK.test(raw)) return null;
+    const ws = raw.trim().split(/\s+/).filter(Boolean);
+    while (ws.length && STOP.test(ws[0].replace(/[.,]/g, ""))) ws.shift();
+    while (ws.length && STOP.test(ws[ws.length - 1].replace(/[.,]/g, ""))) ws.pop();
+    if (ws.length < 2 || ws.length > 5) return null;
+    if (!ws.every((w) => /^[A-Z][A-Za-z.’’]*,?$/.test(w))) return null;
+    const name = ws.join(" ").replace(/,\s*[A-Z][A-Za-z.]{0,4}\.?,?$/, "").replace(/,$/, "").trim();
+    return name.split(/\s+/).length >= 2 ? this.titleCase(name) : null;
   }
 
   /** Top actual occupation from /data-statistik/pekerjaan, skipping non-job categories. */
@@ -168,9 +191,16 @@ export class OpenSIDAdapter implements DataAdapter {
       if (wil.kk > 0) fields.push({ fieldKey: "jumlahKK", value: wil.kk });
     }
 
-    if (home) {
-      const kades = this.parseKepalaDesa(home);
-      if (kades) fields.push({ fieldKey: "kepalaDesa", value: kades });
+    // Kepala desa: JS config object is most reliable (direct DB field).
+    // Fall back to visible text on homepage — only Pattern A (label → name).
+    let kades =
+      (home ? this.parseKadesFromConfig(home) : null) ??
+      (home ? this.parseKepalaDesa(home) : null);
+    if (kades) {
+      // Strip desa name prefix if Pattern A accidentally captured it (e.g. "Sukaluyu, Dadang Kurniawan").
+      const desaPrefix = new RegExp(`^${d.nama.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")},?\\s*`, "i");
+      kades = kades.replace(desaPrefix, "").trim();
+      if (kades.split(/\s+/).length >= 2) fields.push({ fieldKey: "kepalaDesa", value: kades });
     }
 
     const job = pek ? this.parseDominantJob(pek) : null;

@@ -3,6 +3,21 @@ import type { Desa } from "@/lib/types";
 import { formatRupiah } from "@/lib/utils";
 import ChapterPanel, { type SourceNote } from "./ChapterPanel";
 
+// APBDes bidang color by kode prefix (01=pemerintahan, 02=pembangunan, 03=sosial, 04=pemberdayaan, 05=siaga)
+const BIDANG_COLOR: Record<string, { tile: string; stripe: string; bar: string; barTo: string; pct: string }> = {
+  "1": { tile: "tile-good", stripe: "stripe-good", bar: "#10B981", barTo: "#047857", pct: "text-good-900" },
+  "2": { tile: "tile-warn", stripe: "stripe-warn", bar: "#F59E0B", barTo: "#B45309", pct: "text-warn-900" },
+  "3": { tile: "tile-teal", stripe: "stripe-teal", bar: "#14B8A6", barTo: "#0F766E", pct: "text-teal-900" },
+  "4": { tile: "tile-watch", stripe: "stripe-watch", bar: "#F43F5E", barTo: "#BE123C", pct: "text-watch-900" },
+  "5": { tile: "", stripe: "stripe-ink", bar: "#94A3B8", barTo: "#475569", pct: "text-ink-3" },
+};
+const DEFAULT_BIDANG_COLOR = { tile: "tile-brand", stripe: "stripe-brand", bar: "#4F46E5", barTo: "#6366F1", pct: "text-brand-700" };
+
+function getBidangColor(kode: string) {
+  const prefix = kode.replace(/^0/, "").charAt(0);
+  return BIDANG_COLOR[prefix] ?? DEFAULT_BIDANG_COLOR;
+}
+
 function buildChart(riwayat: NonNullable<Desa["riwayat"]>) {
   const pts = riwayat
     .slice()
@@ -45,26 +60,33 @@ export default function ChKinerja({ desa, chapterNo, sourceNote }: { desa: Desa;
       }
     >
       {apbdes.length > 0 ? (
-        <div className="space-y-2.5 reveal reveal-4">
-          {apbdes.map((item) => (
-            <div key={item.kode} className="tile tile-brand stripe-brand">
-              <div className="flex items-baseline justify-between gap-3">
-                <p className="truncate text-[13px] font-medium text-ink-1">{item.bidang}</p>
-                <p className="num text-[12px] font-semibold text-brand-700">{item.persentase}%</p>
+        <div className="space-y-2 reveal reveal-4">
+          {apbdes.map((item, i) => {
+            const c = getBidangColor(item.kode);
+            return (
+              <div key={item.kode} className={`tile ${c.tile} ${c.stripe} flex items-start gap-4 p-5`} style={{ borderRadius: 18 }}>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex items-center gap-2">
+                    <span className="mono text-[10px] font-semibold text-ink-3">{String(i + 1).padStart(2, "0")} · {item.kode.toUpperCase()}</span>
+                  </div>
+                  <div className="mb-2 flex items-baseline justify-between gap-3">
+                    <p className="truncate text-[13px] font-medium text-ink-1">{item.bidang}</p>
+                    <p className={`num text-[13px] font-semibold flex-shrink-0 ${c.pct}`}>{item.persentase}% tercapai</p>
+                  </div>
+                  <div className="my-2 h-[3px] overflow-hidden rounded-full bg-black/[.06]">
+                    <div
+                      className="bar-anim shimmer-fill h-full rounded-full"
+                      style={{ "--w": `${item.persentase}%`, "--c-from": c.bar, "--c-to": c.barTo } as React.CSSProperties}
+                    />
+                  </div>
+                  <p className="num text-[11.5px] text-ink-3 flex justify-between">
+                    <span>Sudah dipakai <span className="font-medium text-ink-1">{formatRupiah(item.realisasi)}</span></span>
+                    <span>dari {formatRupiah(item.anggaran)}</span>
+                  </p>
+                </div>
               </div>
-              <div className="my-2 h-[3px] overflow-hidden rounded-full bg-black/[.06]">
-                <div
-                  className="bar-anim shimmer-fill h-full rounded-full"
-                  style={
-                    { "--w": `${item.persentase}%`, "--c-from": "#4F46E5", "--c-to": "#6366F1" } as React.CSSProperties
-                  }
-                />
-              </div>
-              <p className="num text-[11px] text-ink-3">
-                {formatRupiah(item.realisasi)} dari {formatRupiah(item.anggaran)}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : null}
 
