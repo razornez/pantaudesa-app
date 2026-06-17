@@ -528,19 +528,6 @@ function demoSourceId(desaId) {
   return `source-demo-village-${desaId}`;
 }
 
-function demoSummaryForArjasari(desa, index) {
-  const total = 820000000 + index * 25000000;
-  const persen = 58 + (index % 5) * 7;
-  const realisasi = Math.round(total * persen / 100);
-  return {
-    id: desa.id,
-    total,
-    realisasi,
-    persen,
-    status: persen >= 85 ? "baik" : persen >= 60 ? "sedang" : "rendah",
-  };
-}
-
 async function seedDemoSourcesAndBudgets() {
   // arjasariSummaries removed: Arjasari desa now use REAL data from the
   // ingestion pipeline (DJPK danaDesa). Fake APBDes summaries were

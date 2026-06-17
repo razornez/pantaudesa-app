@@ -44,7 +44,7 @@ Skor **kelengkapan data** dihitung jujur dari dimensi nyata yang benar-benar ter
 
 ```bash
 # 1. Clone & install
-git clone https://github.com/<org>/pantaudesa.git
+git clone https://github.com/razornez/pantaudesa.git
 cd pantaudesa
 npm install
 

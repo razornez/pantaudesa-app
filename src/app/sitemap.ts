@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getDesaListResult } from "@/lib/data/desa-read";
 
-const BASE_URL = "https://pantaudesa.id";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://pantaudesa.vercel.app";
 
 // Regenerate at most once per hour. If the DB is unavailable, getDesaListResult
 // returns an empty list and the sitemap gracefully degrades to static routes

@@ -59,7 +59,7 @@ export class OpenSIDAdapter implements DataAdapter {
       const raw = typeof cfg.nama_kepala_desa === "string" ? cfg.nama_kepala_desa.trim() : null;
       if (!raw || raw.length < 3) return null;
       // Strip leading honorifics (Pj., H., Hj., Dr., Drs., etc.) and trailing degrees (S.E., S.T., M.M., etc.)
-      let cleaned = raw
+      const cleaned = raw
         .replace(/^(?:Pj\.|Plt\.|H\.|Hj\.|Dr\.|Drs\.|Ir\.)\s*/i, "")
         .replace(/,?\s*[A-Z][A-Za-z.]{1,6}(,\s*[A-Z][A-Za-z.]{1,6})*\.?\s*$/, "")
         .trim();

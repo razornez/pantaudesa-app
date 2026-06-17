@@ -14,6 +14,18 @@ import type { Desa } from "@/lib/types";
 import { SECTION } from "@/lib/copy";
 import { ASSETS } from "@/lib/assets";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "PantauDesa — Transparansi Anggaran Dana Desa",
+  description:
+    "Pantau Dana Desa, APBDes, dan profil 3.581 desa di Jawa Barat. Data resmi dari DJPK, Dukcapil, dan sumber pemerintah — terbuka untuk semua warga.",
+  keywords: [
+    "dana desa jawa barat", "APBDes", "transparansi anggaran desa",
+    "pantau desa", "data desa", "kelengkapan data desa",
+  ],
+};
+
 // Revalidate every 5 minutes — same TTL as the module-level desa list cache.
 // Avoids re-fetching 3,581 desa rows on every single page visit.
 export const revalidate = 300;

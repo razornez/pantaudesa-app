@@ -5,6 +5,8 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/lib/auth-context";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://pantaudesa.vercel.app";
+
 export const metadata: Metadata = {
   title: {
     default: "PantauDesa — Transparansi Anggaran Dana Desa",
@@ -18,21 +20,21 @@ export const metadata: Metadata = {
   ],
   authors:  [{ name: "PantauDesa" }],
   creator:  "PantauDesa",
-  metadataBase: new URL("https://pantaudesa.id"),
+  metadataBase: new URL(BASE_URL),
   openGraph: {
     type:        "website",
     locale:      "id_ID",
-    url:         "https://pantaudesa.id",
+    url:         BASE_URL,
     siteName:    "PantauDesa",
     title:       "PantauDesa — Transparansi Anggaran Dana Desa",
     description: "Pantau penggunaan dana desa, bandingkan kinerja antar desa, dan bersuara langsung sebagai warga.",
-    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "PantauDesa" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "PantauDesa" }],
   },
   twitter: {
     card:        "summary_large_image",
     title:       "PantauDesa — Transparansi Anggaran Dana Desa",
     description: "Pantau penggunaan dana desa, bandingkan kinerja antar desa, dan bersuara langsung sebagai warga.",
-    images:      ["/og-default.png"],
+    images:      ["/opengraph-image"],
   },
   robots: { index: true, follow: true },
 };

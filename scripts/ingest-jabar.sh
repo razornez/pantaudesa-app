@@ -54,7 +54,7 @@ if [[ "$PASS" == "locationiq" ]]; then
 fi
 
 if [[ "$PASS" == "opensid" || "$PASS" == "all" ]]; then
-  run_adapter "opensid" "jumlahPenduduk"
+  run_adapter "opensid" "kepalaDesa"
 fi
 
 if [[ "$PASS" == "idm" || "$PASS" == "all" ]]; then

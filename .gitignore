@@ -51,6 +51,12 @@ next-env.d.ts
 .next-start*.log
 .claude/
 .tmp-manual-backoffice-qa/
+.mcp.json
+logs/
+
+# generated/draft docs (internal, not for public repo)
+docs/open-source-playbook.html
+docs/open-source-playbook.pdf
 
 # local-only QA artefacts (screenshots/notes)
 .artifacts/

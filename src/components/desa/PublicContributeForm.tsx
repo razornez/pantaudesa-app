@@ -150,20 +150,50 @@ export default function PublicContributeForm({
           ))}
         </div>
         {missing.length > 0 ? (
-          <div
-            className="mt-3 flex items-start gap-2.5 rounded-xl px-3.5 py-3"
-            style={{ background: "rgba(99,102,241,.06)", boxShadow: "inset 0 0 0 1px rgba(99,102,241,.18)" }}
-          >
-            <Heart size={14} className="mt-0.5 flex-shrink-0 text-indigo-500" aria-hidden />
-            <div className="text-[11.5px] leading-relaxed text-indigo-900">
-              <span className="font-semibold">
-                Tapi dari {DATA_SOURCES.length} sumber itu, masih ada yang belum terjangkau:
-              </span>{" "}
-              {missing.join(", ")}.{" "}
-              <span className="text-indigo-700">
-                Kalau kamu punya dokumen resmi desa ini, bantu kami lengkapi — datamu sangat berarti
-                bagi warga yang membutuhkan.
-              </span>
+          <div className="mt-3 space-y-2">
+            {/* Why is data missing — plain language explanation */}
+            <div
+              className="rounded-xl px-3.5 py-3"
+              style={{ background: "rgba(248,250,252,1)", boxShadow: "inset 0 0 0 1px rgba(148,163,184,.25)" }}
+            >
+              <p className="text-[11.5px] font-semibold text-slate-700 mb-1.5">
+                Kenapa ada data yang belum kami isi?
+              </p>
+              <p className="text-[11.5px] leading-relaxed text-slate-500">
+                Bukan karena tidak mencoba. Beberapa data memang{" "}
+                <span className="font-medium text-slate-700">belum tersedia secara digital</span> di mana pun:
+              </p>
+              <ul className="mt-2 space-y-1.5">
+                <li className="flex items-start gap-2 text-[11.5px] leading-relaxed text-slate-500">
+                  <span className="mt-[5px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-300" aria-hidden />
+                  <span>
+                    <span className="font-medium text-slate-700">Nama kepala desa</span> — tidak ada database
+                    nasional yang terbuka. Data ini hanya ada di kantor desa masing-masing.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2 text-[11.5px] leading-relaxed text-slate-500">
+                  <span className="mt-[5px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-300" aria-hidden />
+                  <span>
+                    <span className="font-medium text-slate-700">Dokumen & anggaran rinci</span> — setiap desa
+                    menyimpan sendiri, belum ada sistem terpusat yang bisa diakses publik.
+                  </span>
+                </li>
+              </ul>
+            </div>
+            {/* CTA */}
+            <div
+              className="flex items-start gap-2.5 rounded-xl px-3.5 py-3"
+              style={{ background: "rgba(99,102,241,.06)", boxShadow: "inset 0 0 0 1px rgba(99,102,241,.18)" }}
+            >
+              <Heart size={14} className="mt-0.5 flex-shrink-0 text-indigo-500" aria-hidden />
+              <div className="text-[11.5px] leading-relaxed text-indigo-900">
+                <span className="font-semibold">Di sinilah kamu bisa bantu.</span>{" "}
+                Data yang masih kosong untuk {desaNama}: {missing.join(", ")}.{" "}
+                <span className="text-indigo-700">
+                  Kalau kamu punya akses ke dokumen resmi desa ini — bahkan foto SK atau laporan —
+                  kirim ke kami. Kontribusimu berarti bagi ribuan warga.
+                </span>
+              </div>
             </div>
           </div>
         ) : (
