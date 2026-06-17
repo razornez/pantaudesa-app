@@ -1024,6 +1024,7 @@ async function fetchDesaDetailItem(idOrSlug: string) {
 // ~3,500-desa Jawa Barat payload exceeds. Module-level cache has no size
 // limit and provides the same 5-minute TTL within a process lifetime.
 // (The "desa-public" tag was declared but never revalidated anywhere.)
+// Cache is busted on new deployment — module-level variables reset in new serverless instances.
 let _desaListCache: { items: Awaited<ReturnType<typeof fetchDesaItems>>; expiresAt: number } | null = null;
 const DESA_LIST_TTL_MS = 5 * 60 * 1000;
 
