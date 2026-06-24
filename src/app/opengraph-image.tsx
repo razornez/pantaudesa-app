@@ -96,7 +96,7 @@ export default function Image() {
         {/* stat strip */}
         <div style={{ display: "flex", gap: 40 }}>
           {[
-            { value: "3.581", label: "Desa Jawa Barat" },
+            { value: "11rb+", label: "Desa di Jawa" },
             { value: "100%", label: "Dana Desa tercatat" },
             { value: "Terbuka", label: "Data sumber resmi" },
           ].map((stat) => (

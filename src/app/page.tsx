@@ -19,9 +19,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "PantauDesa — Transparansi Anggaran Dana Desa",
   description:
-    "Pantau Dana Desa, APBDes, dan profil 3.581 desa di Jawa Barat. Data resmi dari DJPK, Dukcapil, dan sumber pemerintah — terbuka untuk semua warga.",
+    "Pantau Dana Desa, APBDes, dan profil desa di Jawa Barat dan Jawa Tengah. Data resmi dari DJPK, Dukcapil, dan sumber pemerintah — terbuka untuk semua warga.",
   keywords: [
-    "dana desa jawa barat", "APBDes", "transparansi anggaran desa",
+    "dana desa jawa barat", "dana desa jawa tengah", "APBDes", "transparansi anggaran desa",
     "pantau desa", "data desa", "kelengkapan data desa",
   ],
 };

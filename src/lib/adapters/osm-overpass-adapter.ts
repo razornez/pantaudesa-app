@@ -52,15 +52,22 @@ export class OSMOverpassAdapter implements DataAdapter {
   readonly sourceCode = "OSM";
   readonly label = "OpenStreetMap (Overpass) — kabupaten batch";
 
-  private normalizeKab(kab: string): string {
-    return /^(kabupaten|kota)\b/i.test(kab.trim()) ? kab.trim() : `Kabupaten ${kab.trim()}`;
+  /** Returns candidate OSM names to try for a kabupaten (most → least specific). */
+  private kabVariants(kab: string): string[] {
+    const t = kab.trim();
+    if (/^(kabupaten|kota)\b/i.test(t)) return [t];
+    return [`Kabupaten ${t}`, `Kota ${t}`, t];
   }
 
-  /** Batch query: all village/hamlet nodes + admin_level=7 relations in a kabupaten. */
+  /**
+   * Batch query: all village/hamlet nodes + admin_level=7 relations in a kabupaten.
+   * Tries both admin_level=5 (kabupaten) and admin_level=6 (kecamatan-level in some OSM regions)
+   * because Indonesian OSM mappers are inconsistent about which level they use for kabupaten.
+   */
   private batchQuery(kab: string): string {
     const esc = (s: string) => s.replace(/"/g, '\\"');
-    return `[out:json][timeout:50];
-area["admin_level"="5"]["name"="${esc(kab)}"]->.k;
+    return `[out:json][timeout:55];
+(area["admin_level"="5"]["name"="${esc(kab)}"];area["admin_level"="6"]["name"="${esc(kab)}"];)->.k;
 (
   node["place"~"village|hamlet"](area.k);
   relation["boundary"="administrative"]["admin_level"="7"](area.k);
@@ -69,11 +76,11 @@ area["admin_level"="5"]["name"="${esc(kab)}"]->.k;
 out center tags 600;`;
   }
 
-  /** Per-desa fallback query (original approach). */
+  /** Per-desa fallback query — tries both admin_level=5 and admin_level=6 for kabupaten area. */
   private singleQuery(nama: string, kab: string): string {
     const esc = (s: string) => s.replace(/"/g, '\\"');
     return `[out:json][timeout:25];
-area["admin_level"="5"]["name"="${esc(kab)}"]->.k;
+(area["admin_level"="5"]["name"="${esc(kab)}"];area["admin_level"="6"]["name"="${esc(kab)}"];)->.k;
 (
   node["place"~"village|hamlet"]["name"="${esc(nama)}"](area.k);
   relation["boundary"="administrative"]["admin_level"="7"]["name"="${esc(nama)}"](area.k);
@@ -88,20 +95,23 @@ out center tags 5;`;
     // Group desas by kabupaten for batch queries.
     const byKab = new Map<string, typeof context.desas>();
     for (const d of context.desas) {
-      const key = this.normalizeKab(d.kabupaten);
+      const key = d.kabupaten.trim();
       if (!byKab.has(key)) byKab.set(key, []);
       byKab.get(key)!.push(d);
     }
 
     for (const [kab, desas] of byKab) {
-      // ── Batch fetch ────────────────────────────────────────────────────────
+      // ── Batch fetch — try name variants until one returns results ──────────
       let batchEls: OverpassElement[] = [];
-      try {
-        batchEls = await overpassPost(this.batchQuery(kab));
-        await sleep(2000); // polite pause after a heavy kabupaten query
-      } catch {
-        batchEls = [];
+      let resolvedKab = `Kabupaten ${kab}`;
+      for (const variant of this.kabVariants(kab)) {
+        try {
+          const els = await overpassPost(this.batchQuery(variant));
+          if (els.length > 0) { batchEls = els; resolvedKab = variant; break; }
+          await sleep(800);
+        } catch { /* try next variant */ }
       }
+      await sleep(2000); // polite pause after kabupaten batch
 
       // Build lookup maps from the batch result.
       // 1. By normalised OSM ref tag  (e.g. "3204052001")  → most reliable
@@ -147,7 +157,7 @@ out center tags 5;`;
       // ── Fallback: per-desa queries for anything the batch missed ───────────
       for (const d of unmatched) {
         try {
-          const els = await overpassPost(this.singleQuery(d.nama, kab));
+          const els = await overpassPost(this.singleQuery(d.nama, resolvedKab));
           await sleep(1100);
           const node = els.find((e) => e.type === "node" && e.tags?.place) ?? els[0];
           const c = node ? extractCoords(node) : null;

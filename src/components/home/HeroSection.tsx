@@ -212,7 +212,7 @@ export default function HeroSection({ totalDesa, tahun }: Props) {
 
               <p className="text-[9px] text-slate-400 uppercase tracking-widest font-mono mb-0.5">Dana Desa {tahun}</p>
               <p className="text-sm font-bold text-slate-800 mb-0.5">Desa Sukamaju</p>
-              <p className="text-[10px] text-slate-400 mb-4 font-mono">Ciawi · Bogor · Jawa Barat</p>
+              <p className="text-[10px] text-slate-400 mb-4 font-mono">Ciawi · Bogor · Jawa Tengah</p>
 
               <div className="space-y-3.5">
                 {RECEIPT_BARS.map((bar, i) => (
