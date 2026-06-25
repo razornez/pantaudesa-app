@@ -17,6 +17,17 @@ cd "$(dirname "$0")/.." || exit 1
 TSX=./node_modules/.bin/tsx
 PASS=${1:-all}
 
+# Parse --resume-from <kabupaten>
+RESUME_FROM=""
+for i in "$@"; do
+  if [[ "$i" == "--resume-from" ]]; then
+    RESUME_FROM_NEXT=1
+  elif [[ -n "$RESUME_FROM_NEXT" ]]; then
+    RESUME_FROM="$i"
+    RESUME_FROM_NEXT=""
+  fi
+done
+
 JABAR_KABS=(
   Bogor Sukabumi Cianjur Bandung Garut Tasikmalaya
   Ciamis Kuningan Cirebon Majalengka Sumedang Indramayu
@@ -28,8 +39,19 @@ JABAR_KABS=(
 
 run_adapter() {
   local adapter=$1; local skip_field=$2
+  local skipping=1
+  [[ -z "$RESUME_FROM" ]] && skipping=0
   echo "=== Adapter: $adapter ==="
+  [[ $skipping -eq 1 ]] && echo "  (skip sampai: $RESUME_FROM)"
   for kab in "${JABAR_KABS[@]}"; do
+    if [[ $skipping -eq 1 ]]; then
+      if [[ "$kab" == "$RESUME_FROM" ]]; then
+        skipping=0
+      else
+        echo "  ↷ skip $kab"
+        continue
+      fi
+    fi
     printf "  %-30s " "$kab"
     $TSX scripts/ingest-run.ts --kabupaten "$kab" --only "$adapter" \
       ${skip_field:+--skip-have "$skip_field"} 2>&1 \
@@ -72,17 +94,21 @@ if [[ "$PASS" == "kecamatan" || "$PASS" == "all" ]]; then
 fi
 
 echo ""
-echo "=== Coverage check ==="
-$TSX scripts/ingest-run.ts --kabupaten Bandung --only osm 2>&1 | tail -1  # dummy to trigger db query
-$TSX -e "
-import { config as loadEnv } from 'dotenv';
-loadEnv({ path: '.env.local', override: false }); loadEnv({ path: '.env', override: false });
+echo "=== Coverage check Jawa Barat ==="
+node --input-type=module << 'JSEOF'
+import { config } from 'dotenv';
+config({ path: '.env.local' });
 if (process.env.DIRECT_URL) process.env.DATABASE_URL = process.env.DIRECT_URL;
-const { db } = await import('./src/lib/db/index.ts');
-const f = async (k) => (await db.dataDesa.findMany({where:{fieldKey:k,isActive:true,status:'PUBLISHED',sourceId:{not:null}},select:{desaId:true},distinct:['desaId']})).length;
-const total = await db.desa.count({where:{provinsi:{contains:'Jawa Barat',mode:'insensitive'}}});
-const [dana,geo,luas,kades,pend] = await Promise.all([f('danaDesa'),f('geoLat'),f('luasWilayah'),f('kepalaDesa'),f('jumlahPenduduk')]);
-const p = n => n+'/'+ total+'('+ Math.round(n/total*100)+'%)';
-console.log('danaDesa', p(dana), '| geoLat', p(geo), '| luas', p(luas), '| kades', p(kades), '| pend', p(pend));
-await db.disconnect();
-" 2>&1 | grep -E "danaDesa|ERR"
+const { PrismaClient } = await import('./src/generated/prisma/index.js');
+const db = new PrismaClient();
+const f = k => db.dataDesa.findMany({ where:{ fieldKey:k, isActive:true, status:'PUBLISHED', sourceId:{not:null}, desa:{provinsi:{contains:'Jawa Barat'}} }, select:{desaId:true}, distinct:['desaId'] }).then(r=>r.length);
+const total = await db.desa.count({ where:{ provinsi:{ contains:'Jawa Barat' } } });
+const [dana,geo,pend,kades,kat] = await Promise.all([f('danaDesa'),f('geoLat'),f('jumlahPenduduk'),f('kepalaDesa'),f('kategori')]);
+const p = (n,t) => `${n}/${t} (${Math.round(n/t*100)}%)`;
+console.log(`danaDesa  : ${p(dana,total)}`);
+console.log(`geoLat    : ${p(geo,total)}`);
+console.log(`penduduk  : ${p(pend,total)}`);
+console.log(`kepalaDesa: ${p(kades,total)}`);
+console.log(`kategori  : ${p(kat,total)}`);
+await db.$disconnect();
+JSEOF
