@@ -33,6 +33,8 @@ const PROVINCE_CODE: Record<string, string> = {
   "SULAWESI UTARA": "71", "SULAWESI TENGAH": "72", "SULAWESI SELATAN": "73",
   "SULAWESI TENGGARA": "74", GORONTALO: "75", "SULAWESI BARAT": "76",
   MALUKU: "81", "MALUKU UTARA": "82", "PAPUA BARAT": "91", PAPUA: "94",
+  // Provinsi pemekaran Papua 2022 (kode IDM empiris: 92=Barat Daya, 93=Selatan, 95=Pegunungan)
+  "PAPUA BARAT DAYA": "92", "PAPUA SELATAN": "93", "PAPUA PEGUNUNGAN": "95",
 };
 
 const ALL_PROV_CODES = [...new Set(Object.values(PROVINCE_CODE))].sort();
