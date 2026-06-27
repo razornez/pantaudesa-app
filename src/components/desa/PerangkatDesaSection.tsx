@@ -60,7 +60,7 @@ export default function PerangkatDesaSection({ perangkat }: Props) {
                 {item.kontak ? (
                   <div className="mt-3 flex items-start gap-1.5 text-xs leading-relaxed text-slate-500">
                     <Building2 size={12} className="mt-0.5 flex-shrink-0 text-slate-400" aria-hidden />
-                    <span>Nomor kantor desa — hubungi via kanal resmi</span>
+                    <span>Nomor kantor desa. Hubungi lewat kanal resmi.</span>
                   </div>
                 ) : null}
               </div>

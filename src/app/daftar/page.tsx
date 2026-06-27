@@ -257,7 +257,7 @@ function DaftarInner() {
                   <div key={r.level} className="flex items-start gap-2">
                     <span className={`inline-block w-2 h-2 rounded-full mt-1 flex-shrink-0 ${r.color}`} />
                     <span className="text-indigo-100 leading-relaxed">
-                      <span className="font-bold text-white">{r.level}</span> — {r.items}
+                      <span className="font-bold text-white">{r.level}:</span> {r.items}
                     </span>
                   </div>
                 ))}
@@ -429,7 +429,7 @@ function DaftarInner() {
               <p className="text-sm text-slate-500 mt-2 leading-relaxed">
                 Kode 6 digit dikirim ke{" "}
                 <span className="font-semibold text-slate-700">{form.email}</span>.
-                <br />Berlaku 10 menit — masukkan segera.
+                <br />Berlaku 10 menit, masukkan segera.
               </p>
             </div>
 
@@ -476,7 +476,7 @@ function DaftarInner() {
                   <ul className="list-disc list-inside space-y-0.5">
                     <li>Cek folder <strong>Spam</strong> atau <strong>Promotions</strong></li>
                     <li>Tunggu hingga tombol &quot;Kirim Ulang&quot; muncul, lalu klik</li>
-                    <li>Pastikan emailmu benar — kalau salah, kembali dan ubah</li>
+                    <li>Pastikan emailmu benar. Kalau salah, kembali dan ubah</li>
                   </ul>
                 </div>
               </details>

@@ -11,7 +11,7 @@ export default function VerifyPage() {
         <div>
           <h1 className="text-xl font-black text-slate-900">Cek emailmu!</h1>
           <p className="text-sm text-slate-500 mt-2 leading-relaxed">
-            Kami kirimkan magic link ke emailmu. Klik link di email untuk masuk — berlaku 10 menit.
+            Kami kirimkan magic link ke emailmu. Klik link di email untuk masuk. Berlaku 10 menit.
           </p>
         </div>
         <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-xs text-amber-700 text-left">

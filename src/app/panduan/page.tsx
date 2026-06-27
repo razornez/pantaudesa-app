@@ -33,7 +33,7 @@ const SECTIONS: Section[] = [
     items: [
       {
         q: "Apa itu PantauDesa?",
-        a: "PantauDesa adalah platform publik yang memudahkan warga memantau penggunaan anggaran dana desa. Setiap tahun, setiap desa di Indonesia menerima miliaran rupiah dari negara — PantauDesa membantu kamu memastikan uang itu digunakan dengan benar.",
+        a: "PantauDesa adalah platform publik yang memudahkan warga memantau penggunaan anggaran dana desa. Setiap tahun, setiap desa di Indonesia menerima miliaran rupiah dari negara. PantauDesa membantu kamu memastikan uang itu digunakan dengan benar.",
       },
       {
         q: "Apakah perlu akun untuk melihat data?",
@@ -41,7 +41,7 @@ const SECTIONS: Section[] = [
       },
       {
         q: "Bagaimana cara mendaftar?",
-        a: "Klik 'Daftar' di navbar, isi nama dan email, lalu verifikasi dengan kode OTP yang kami kirimkan. Proses selesai dalam 2 menit — tidak perlu password.",
+        a: "Klik 'Daftar' di navbar, isi nama dan email, lalu verifikasi dengan kode OTP yang kami kirimkan. Proses selesai dalam 2 menit dan tidak perlu password.",
       },
       {
         q: "Apakah data yang ditampilkan akurat?",
@@ -77,7 +77,7 @@ const SECTIONS: Section[] = [
     items: [
       {
         q: "Apa itu 'Suara Warga'?",
-        a: "Suara Warga adalah fitur untuk melaporkan kondisi nyata di desamu — jalan berlubang, posyandu tidak aktif, BLT tidak cair, dll. Berbeda dari pengaduan formal, suara warga tidak perlu tanda tangan atau bahasa baku.",
+        a: "Suara Warga adalah fitur untuk melaporkan kondisi nyata di desamu: jalan berlubang, posyandu tidak aktif, BLT tidak cair, dan sebagainya. Berbeda dari pengaduan formal, suara warga tidak perlu tanda tangan atau bahasa baku.",
       },
       {
         q: "Apa bedanya vote 'Benar' vs 'Bohong'?",
