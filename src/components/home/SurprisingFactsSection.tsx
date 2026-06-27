@@ -58,6 +58,20 @@ const FACTS: Fact[] = [
     provinsi: "DKI Jakarta",
     warna: "rose",
   },
+  {
+    angka: "73%",
+    judul: "Bali punya coverage peta tertinggi setelah Jawa Barat karena pariwisata",
+    body: "Dari 636 desa di Bali, 73% sudah punya koordinat di OpenStreetMap. Ini jauh di atas rata-rata nasional. Efeknya nyata: wisatawan dan relawan internasional yang mapping destinasi wisata secara tidak langsung membantu transparansi data desa.",
+    provinsi: "Bali",
+    warna: "emerald",
+  },
+  {
+    angka: "96",
+    judul: "Bangli, kabupaten tanpa pantai, punya portal desa digital terbanyak di Bali",
+    body: "Badung punya Kuta dan Seminyak. Gianyar punya Ubud. Tapi Bangli, kabupaten pegunungan yang paling sedikit dikunjungi turis, justru punya 96 desa yang aktif di OpenSID. Lebih banyak dari semua kabupaten lain di Bali digabung.",
+    provinsi: "Bali",
+    warna: "sky",
+  },
 ];
 
 const colorMap = {
