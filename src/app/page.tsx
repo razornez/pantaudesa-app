@@ -7,6 +7,7 @@ import SerapanDonut from "@/components/home/SerapanDonut";
 import DesaLeaderboard from "@/components/home/DesaLeaderboard";
 import AlertDiniSection from "@/components/home/AlertDiniSection";
 import CitizenJourneySection from "@/components/home/CitizenJourneySection";
+import SurprisingFactsSection from "@/components/home/SurprisingFactsSection";
 import DocumentDeskSection from "@/components/home/DocumentDeskSection";
 import { buildSummaryStats, getDesaListResult } from "@/lib/data/desa-read";
 import { perfStart, publicPerfLog, publicPerfLogWithRows } from "@/lib/perf";
@@ -106,6 +107,7 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <SurprisingFactsSection />
       <CitizenJourneySection />
       <DocumentDeskSection />
 
