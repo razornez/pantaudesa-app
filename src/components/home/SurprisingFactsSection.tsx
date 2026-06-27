@@ -59,6 +59,13 @@ const FACTS: Fact[] = [
     warna: "rose",
   },
   {
+    angka: "2%",
+    judul: "Yogyakarta, kota pelajar, hampir tidak punya portal desa digital sama sekali",
+    body: "Dari 392 desa di DI Yogyakarta, hanya 6 yang punya portal desa digital (OpenSID). Kota Yogyakarta sendiri tidak punya desa — semua wilayahnya adalah kelurahan, persis seperti Jakarta. Kota pendidikan ternama Indonesia ternyata tidak lebih terhubung secara digital daripada desa-desa di pedalaman.",
+    provinsi: "DI Yogyakarta",
+    warna: "indigo",
+  },
+  {
     angka: "636",
     judul: "Bali yang terkenal sedunia hanya punya 636 desa, lebih sedikit dari satu kabupaten Jawa",
     body: "Buleleng saja punya 129 desa. Satu kabupaten di Jawa Tengah bisa menandingi seluruh Bali. Bali kecil, banyak wilayahnya kelurahan bukan desa, dan program dana desa tidak menjangkau kawasan urban. Popularitas global tidak berarti banyak desa.",
