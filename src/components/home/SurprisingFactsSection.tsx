@@ -59,6 +59,13 @@ const FACTS: Fact[] = [
     warna: "rose",
   },
   {
+    angka: "636",
+    judul: "Bali yang terkenal sedunia hanya punya 636 desa, lebih sedikit dari satu kabupaten Jawa",
+    body: "Buleleng saja punya 129 desa. Satu kabupaten di Jawa Tengah bisa menandingi seluruh Bali. Bali kecil, banyak wilayahnya kelurahan bukan desa, dan program dana desa tidak menjangkau kawasan urban. Popularitas global tidak berarti banyak desa.",
+    provinsi: "Bali",
+    warna: "amber",
+  },
+  {
     angka: "73%",
     judul: "Bali punya coverage peta tertinggi setelah Jawa Barat karena pariwisata",
     body: "Dari 636 desa di Bali, 73% sudah punya koordinat di OpenStreetMap. Ini jauh di atas rata-rata nasional. Efeknya nyata: wisatawan dan relawan internasional yang mapping destinasi wisata secara tidak langsung membantu transparansi data desa.",
