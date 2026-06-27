@@ -234,7 +234,7 @@ export default function DesaLeaderboard({ topBaik, topRendah, provinsiRanking, t
           <div className="px-4 py-3 bg-amber-50/60 border-b border-amber-100 flex items-center gap-2">
             <Search size={14} className="text-amber-600 flex-shrink-0" />
             <DataStatusBadge status="needs-review" />
-            <p className="text-xs text-amber-800 font-semibold">Datanya masih minim — bantu lengkapi dari sumber resminya.</p>
+            <p className="text-xs text-amber-800 font-semibold">Datanya masih minim. Bantu lengkapi dari sumber resminya.</p>
           </div>
           {topRendah.map((d, i) => <RankRow key={d.id} desa={d} rank={i + 1} warning />)}
         </div>

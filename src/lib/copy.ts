@@ -35,7 +35,7 @@ export const BIDANG_CITIZEN_LABELS: Record<string, { label: string; hint: string
   },
   "5": {
     label: "Dana Siaga Bencana & Darurat",
-    hint:  "Cadangan untuk situasi tak terduga — bencana alam, wabah, dll.",
+    hint:  "Cadangan untuk situasi darurat: bencana alam, wabah, dan sejenisnya.",
   },
 };
 
@@ -47,7 +47,7 @@ export const SECTION = {
   ringkasanNasionalSub: "Gambaran besar kelengkapan data dan Dana Desa untuk desa-desa di seluruh Indonesia",
   alertDini:            "Desa yang Datanya Masih Minim",
   alertDiniSub: (n: number) =>
-    `${n} desa datanya masih minim — bantu lengkapi dengan menelusuri sumber resminya.`,
+    `${n} desa datanya masih minim. Bantu lengkapi dengan menelusuri sumber resminya.`,
   distribusi:    "Berapa Desa yang Datanya Sudah Lengkap?",
   distribusiSub: "Sebaran desa berdasarkan seberapa lengkap data yang berhasil dikumpulkan",
   topBaik:       "Desa dengan Capaian Tinggi",
@@ -59,13 +59,13 @@ export const SECTION = {
 
   // Detail desa
   pendapatan:    "Dari Mana Uang Desa Ini Berasal?",
-  pendapatanSub: "Desa mendapat anggaran dari beberapa sumber — semuanya uang rakyat",
+  pendapatanSub: "Desa mendapat anggaran dari beberapa sumber, semuanya uang rakyat.",
   skor:          "Seberapa Terbuka Desa Ini ke Warganya?",
   skorSub:       "Dinilai dari keterbukaan informasi, ketepatan laporan, dan respons terhadap warga",
   outputFisik:   "Apa yang Seharusnya Sudah Ada atau Dikerjakan?",
   outputFisikSub:"Hasil nyata yang seharusnya bisa kamu lihat dan rasakan dari anggaran ini",
   apbdes:        "Anggaran Ini Dipakai untuk Apa Saja?",
-  apbdesSub:     "Rincian penggunaan per bidang — kamu berhak mengetahui ini",
+  apbdesSub:     "Rincian penggunaan per bidang. Ini adalah hakmu sebagai warga.",
   perangkat:     "Siapa yang Harus Kamu Tanya?",
   perangkatSub:  "Pejabat desa yang bertanggung jawab atas pengelolaan anggaran ini",
   riwayat:       "Apakah Kinerjanya Membaik dari Tahun ke Tahun?",
@@ -108,7 +108,7 @@ export const SKOR = {
   labels: {
     transparan: "Desa ini cukup terbuka ke warganya",
     cukup:      "Masih ada informasi yang sulit diakses warga",
-    rendah:     "Desa ini kurang terbuka — kamu berhak meminta informasi",
+    rendah:     "Desa ini kurang terbuka. Kamu berhak meminta informasi.",
   },
   metricLabels: {
     ketepatan:   "Laporan disampaikan tepat waktu?",
@@ -125,7 +125,7 @@ export const SKOR = {
     "Konsistensi serapan anggaran sepanjang tahun",
     "Respons desa terhadap kanal pertanyaan warga",
   ],
-  methodologyNote: "Skor ini adalah simulasi demo — bukan skor resmi atau final. Angka sebenarnya bergantung pada sumber data yang sudah diverifikasi.",
+  methodologyNote: "Skor ini masih simulasi demo, bukan skor resmi atau final. Angka sebenarnya bergantung pada sumber data yang sudah diverifikasi.",
 } as const;
 
 // ─── SeharusnyaAdaSection safety copy (RIGHTS-01, RIGHTS-06) ─────────────────
@@ -173,7 +173,7 @@ export const DONUT_LABELS = {
 export const HERO = {
   badge:     (tahun: number, total: number) => `Data ${tahun} · ${total} Desa Terpantau`,
   title:     "Uang desamu sudah dipakai untuk apa?",
-  subtitle:  "Setiap tahun desamu mendapat miliaran rupiah dari negara. Uang itu untuk kamu — rakyatnya. Cari desamu dan lihat: sudah dipakai dengan benar atau belum.",
+  subtitle:  "Setiap tahun desamu mendapat miliaran rupiah dari negara. Uang itu untuk kamu, rakyatnya. Cari desamu dan lihat sudah dipakai untuk apa.",
   ctaSearch: "Cari Desamu Sekarang",
   ctaAll:    "Cara Membaca Data",
 } as const;
@@ -323,7 +323,7 @@ export const AUTHORITY_HIGHLIGHTS = [
 
 export const DOKUMEN = {
   tersedia: "Lihat dokumen",
-  belum:    "Belum ada — kamu berhak memintanya!",
+  belum:    "Belum ada. Kamu berhak memintanya.",
 } as const;
 
 // ─── Pre-report checklist gate (REPORT-01 through REPORT-07) ─────────────────
@@ -337,8 +337,8 @@ export const PRE_REPORT = {
     "Dokumentasikan bukti lapangan.",
     "Gunakan jalur tanya dulu sebelum eskalasi.",
   ],
-  ctaReady:    "Saya sudah cek — lanjut melihat jalur pelaporan",
-  ctaNotReady: "Belum siap — kembali ke panduan",
+  ctaReady:    "Sudah cek semua, lanjut lihat jalur pelaporan",
+  ctaNotReady: "Belum siap, kembali ke panduan",
   lapor:       "Lapor ke LAPOR.go.id",
   hotline:     "Hotline 1708",
   inspektorat: (kab: string) => `Inspektorat ${kab}`,
@@ -361,6 +361,6 @@ export const FILTER = {
 // ─── Footer ───────────────────────────────────────────────────────────────────
 
 export const FOOTER = {
-  tagline:   "Kami hadir untuk menjawab pertanyaan yang selama ini tidak pernah dijawab — tentang uang desamu.",
+  tagline:   "Kami hadir untuk menjawab pertanyaan yang selama ini tidak pernah dijawab. Tentang uang desamu.",
   copyright: (year: number) => `© ${year} PantauDesa`,
 } as const;

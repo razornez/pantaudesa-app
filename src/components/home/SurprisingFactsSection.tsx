@@ -11,50 +11,50 @@ type Fact = {
 const FACTS: Fact[] = [
   {
     angka: "100%",
-    judul: "Jawa Barat punya kelengkapan data hampir sempurna",
-    body: "Dari 3.581 desa di Jabar, 6 dari 7 field data utama—penduduk, luas wilayah, dana desa, koordinat, topografi, dan kategori IDM—berhasil dicapai ≥99%. Ternyata data resmi itu ada, tinggal dikumpulkan.",
+    judul: "Jawa Barat punya kelengkapan data yang nyaris sempurna",
+    body: "Dari 3.581 desa di Jabar, hampir semua field penting sudah terisi di atas 99%: data penduduk, luas wilayah, dana desa, koordinat, topografi, sampai kategori IDM. Datanya ada di sumber resmi, tinggal dikumpulkan.",
     provinsi: "Jawa Barat",
     warna: "emerald",
   },
   {
     angka: "7.810",
     judul: "Jawa Tengah punya lebih banyak desa dari Papua dan Jabar digabung",
-    body: "Jateng menyimpan 7.810 desa—lebih dari Papua (7.181) dan Jabar (3.581) sekaligus. Dana desanya 100% tercatat dan penduduknya 100% terlacak, tapi koordinat OSM baru 42%.",
+    body: "Jateng punya 7.810 desa, lebih banyak dari Papua (7.181) dan Jabar (3.581) dijumlah sekalipun. Dana desanya 100% tercatat dan data penduduk sudah lengkap, tapi koordinat peta baru tersedia untuk 42% desa.",
     provinsi: "Jawa Tengah",
     warna: "indigo",
   },
   {
     angka: "226",
-    judul: "Yahukimo punya koordinat OSM meski hanya bisa dicapai lewat udara",
-    body: "Yahukimo adalah salah satu kabupaten paling terisolir di Indonesia—tidak ada jalan raya, akses hanya via penerbangan. Namun sukarelawan OSM berhasil memetakan 226 desa. Lebih baik dari banyak kabupaten di Jawa.",
+    judul: "Yahukimo punya 226 titik peta meski hanya bisa dicapai lewat udara",
+    body: "Yahukimo tidak punya jalan raya. Satu-satunya akses ke sana adalah pesawat. Tapi sukarelawan OpenStreetMap tetap memetakan 226 desa di sana, lebih banyak dari banyak kabupaten di Jawa.",
     provinsi: "Papua Pegunungan",
     warna: "sky",
   },
   {
     angka: "5.000+",
-    judul: "DJPK belum mencatat desa di 4 provinsi Papua yang lahir tahun 2022",
-    body: "Provinsi Papua Selatan, Papua Tengah, Papua Pegunungan, dan Papua Barat Daya sudah 3 tahun berdiri, tapi basis data dana desa nasional (DJPK) belum diperbarui. Dana mengalir, tapi pencatatan pusat ketinggalan.",
+    judul: "Empat provinsi Papua yang lahir 2022 masih tidak terdeteksi DJPK",
+    body: "Papua Selatan, Papua Tengah, Papua Pegunungan, dan Papua Barat Daya sudah berdiri 3 tahun. Tapi sistem dana desa nasional (DJPK) belum pernah diperbarui untuk mereka. Dananya sudah mengalir, tapi pencatatannya belum mengikuti.",
     provinsi: "Papua",
     warna: "amber",
   },
   {
     angka: "40",
-    judul: "Nduga—zona konflik aktif—sudah punya 40 desa terpetakan di OSM",
-    body: "Nduga adalah kabupaten dengan akses paling terbatas di Indonesia. Tapi 40 desa sudah ada di peta OpenStreetMap, kemungkinan besar dari pemetaan kemanusiaan untuk respons bencana dan bantuan.",
+    judul: "Nduga, kawasan konflik aktif, sudah ada 40 desa di OpenStreetMap",
+    body: "Nduga adalah kabupaten paling sulit dijangkau di Indonesia. Tapi 40 desanya sudah ada di OpenStreetMap, kemungkinan dari pemetaan kemanusiaan untuk keperluan bantuan darurat.",
     provinsi: "Papua Pegunungan",
     warna: "rose",
   },
   {
     angka: "8%",
-    judul: "Hanya 8% desa Jabar yang punya portal OpenSID",
-    body: "Meski Jabar adalah provinsi dengan data paling lengkap di PantauDesa, hanya 300 dari 3.581 desa yang mempublikasikan data lewat portal desa digital (OpenSID). Transparansi online masih sangat terbatas.",
+    judul: "Hanya 8% desa Jabar yang punya portal desa digital",
+    body: "Meski Jabar adalah provinsi dengan data paling lengkap di PantauDesa, hanya sekitar 300 dari 3.581 desa yang mempublikasikan data lewat portal desa digital (OpenSID). Transparansi online masih sangat terbatas.",
     provinsi: "Jawa Barat",
     warna: "indigo",
   },
   {
     angka: "0",
-    judul: "Jakarta punya 0 desa—ibukota negara tak tersentuh sistem ini",
-    body: "DKI Jakarta tidak memiliki satu pun desa. Semua unit administrasinya adalah kelurahan, bukan desa. Artinya Jakarta tidak dapat dana desa, tidak punya skor IDM, dan tidak terdeteksi di PantauDesa. Ibukota negara berada di luar radar sistem desa nasional.",
+    judul: "Jakarta tidak punya satu pun desa dan tidak masuk sistem dana desa",
+    body: "DKI Jakarta tidak punya desa. Semua wilayahnya adalah kelurahan, bukan desa. Itu artinya Jakarta tidak pernah dapat dana desa, tidak masuk penilaian IDM, dan sampai hari ini tidak terdeteksi oleh PantauDesa.",
     provinsi: "DKI Jakarta",
     warna: "rose",
   },
@@ -105,7 +105,7 @@ export default function SurprisingFactsSection() {
           Yang kami temukan saat mengumpulkan data 18.000+ desa
         </h2>
         <p className="mt-1 text-sm text-slate-500">
-          Dari Jawa Barat ke Papua, data pemerintah menyimpan cerita yang tidak selalu terduga.
+          Dari Jawa Barat sampai Papua, data pemerintah selalu menyimpan sesuatu yang tidak terduga.
         </p>
       </div>
 

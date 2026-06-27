@@ -20,7 +20,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "PantauDesa — Transparansi Anggaran Dana Desa",
   description:
-    "Pantau Dana Desa, APBDes, dan profil desa di Jawa Barat, Jawa Tengah, dan Papua. Data resmi dari DJPK, Dukcapil, dan sumber pemerintah — terbuka untuk semua warga.",
+    "Pantau Dana Desa, APBDes, dan profil desa di Jawa Barat, Jawa Tengah, dan Papua. Data resmi dari DJPK, Dukcapil, dan sumber pemerintah. Terbuka untuk semua warga.",
   keywords: [
     "dana desa jawa barat", "dana desa jawa tengah", "dana desa papua", "APBDes",
     "transparansi anggaran desa", "pantau desa", "data desa", "kelengkapan data desa",
@@ -93,7 +93,7 @@ export default async function HomePage() {
           <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Prioritas warga</p>
           <h2 className="text-lg font-semibold text-slate-800 mt-1">Mulai dari desa yang datanya paling lengkap</h2>
           <p className="text-sm text-slate-500 mt-1">
-            Urutan ini berdasarkan seberapa lengkap data resmi tiap desa berhasil dikumpulkan — semakin lengkap, semakin mudah dipantau warga.
+            Urutan ini mengikuti kelengkapan data resmi tiap desa. Semakin lengkap datanya, semakin mudah dipantau warga.
           </p>
         </div>
         <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] gap-4 items-start">
